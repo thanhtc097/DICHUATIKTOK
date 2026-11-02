@@ -48,6 +48,11 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(overlayDir, 'admin.html'));
 });
 
+// Trang Overlay Pixel Art / Retro 16-Bit Độc Quyền
+app.get('/pixel', (req, res) => {
+  res.sendFile(path.join(overlayDir, 'pixel.html'));
+});
+
 app.use(express.static(overlayDir));
 
 const seatManager = new SeatManager();

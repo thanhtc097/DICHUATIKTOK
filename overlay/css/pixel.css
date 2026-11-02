@@ -1,0 +1,496 @@
+/* ==========================================================================
+   THIỀN ĐƯỜNG TỊNH TÂM — PHIÊN BẢN PIXEL ART / RETRO 16-BIT OVERLAY (9:16)
+   Phong cách Retro Hoài Niệm: RPG 16-bit / Zen Master Pixel World
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+
+:root {
+  --bg-deep: #120a1c;
+  --bg-card: rgba(26, 16, 38, 0.92);
+  --gold-amber: #f8b800;
+  --gold-bright: #ffe640;
+  --gold-dark: #b87800;
+  --lotus-pink: #f878a8;
+  --jade-green: #38b878;
+  --wood-brown: #5c3018;
+  --wood-dark: #3a1c0c;
+  --retro-border: #f8b800;
+  --pixel-shadow: #0a0610;
+  --text-primary: #fff8e8;
+  --text-muted: #d0b898;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-user-select: none;
+  user-select: none;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-deep);
+  font-family: 'VT323', 'Be Vietnam Pro', monospace;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* KHUNG HIỂN THỊ CHUẨN 9:16 (540x960 hoặc scale tối đa theo chiều cao) */
+#stage-container {
+  position: relative;
+  width: 540px;
+  height: 960px;
+  max-width: 100vw;
+  max-height: 100vh;
+  aspect-ratio: 9 / 16;
+  background-color: #1a0f26;
+  overflow: hidden;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(248, 184, 0, 0.2);
+}
+
+/* LỚP CANVAS PIXEL ART CHÍNH */
+#pixel-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* LỚP SCANLINES CRT RETRO (HIỆU ỨNG TIVI HOÀI NIỆM) */
+.scanlines-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 10, 28, 0) 50%, 
+    rgba(0, 0, 0, 0.22) 50%
+  );
+  background-size: 100% 4px;
+  opacity: 0.65;
+}
+
+/* ==========================================================================
+   VIỀN PIXEL RETRO BEVEL (BOX-SHADOW BẬC THANG 16-BIT)
+   ========================================================================== */
+.pixel-box {
+  background: var(--bg-card);
+  border: 3px solid var(--retro-border);
+  box-shadow: 
+    inset -3px -3px 0 0 var(--gold-dark),
+    inset 3px 3px 0 0 var(--gold-bright),
+    3px 3px 0 0 var(--pixel-shadow);
+  border-radius: 0;
+}
+
+.pixel-box-sm {
+  background: rgba(36, 20, 52, 0.95);
+  border: 2px solid var(--gold-amber);
+  box-shadow: 
+    inset -2px -2px 0 0 var(--gold-dark),
+    inset 2px 2px 0 0 var(--gold-bright),
+    2px 2px 0 0 var(--pixel-shadow);
+}
+
+/* ==========================================================================
+   TOP HUD: BANNER CHÙA PIXEL & ĐỒNG HỒ / BỘ ĐẾM 16-BIT
+   ========================================================================== */
+.top-hud {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+}
+
+.temple-banner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 14px;
+  background: rgba(28, 14, 40, 0.92);
+  border: 3px solid var(--gold-amber);
+  box-shadow: 
+    inset -3px -3px 0 0 var(--gold-dark),
+    inset 3px 3px 0 0 var(--gold-bright),
+    3px 3px 0 0 rgba(0, 0, 0, 0.6);
+}
+
+.banner-lotus-pixel {
+  font-size: 26px;
+  line-height: 1;
+  color: var(--lotus-pink);
+  filter: drop-shadow(0 0 6px rgba(248, 120, 168, 0.6));
+  animation: pulse-lotus 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-lotus {
+  0% { transform: scale(1); filter: drop-shadow(0 0 4px var(--lotus-pink)); }
+  100% { transform: scale(1.15); filter: drop-shadow(0 0 10px var(--gold-bright)); }
+}
+
+.banner-texts h1 {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: var(--gold-bright);
+  text-shadow: 2px 2px 0 #5c3018, 0 0 8px rgba(255, 230, 64, 0.5);
+  margin-bottom: 2px;
+}
+
+.banner-texts p {
+  font-family: 'VT323', monospace;
+  font-size: 19px;
+  color: #fff0c0;
+  letter-spacing: 1px;
+}
+
+.status-pills {
+  pointer-events: auto;
+  display: flex;
+  gap: 8px;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  background: rgba(28, 14, 40, 0.92);
+  border: 2px solid var(--gold-amber);
+  box-shadow: 
+    inset -2px -2px 0 0 var(--gold-dark),
+    inset 2px 2px 0 0 var(--gold-bright),
+    2px 2px 0 0 rgba(0, 0, 0, 0.6);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+}
+
+.pixel-blinking-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--jade-green);
+  box-shadow: 0 0 6px var(--jade-green);
+  display: inline-block;
+  animation: pixel-blink 1.2s steps(2, start) infinite;
+}
+
+@keyframes pixel-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.status-pill strong {
+  color: #ffffff;
+  font-weight: normal;
+}
+
+.status-pill .pill-sub {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   BẢNG HƯỚNG DẪN BÊN TRÁI (LEFT GUIDE CARD RETRO)
+   ========================================================================== */
+.left-guide-card {
+  position: absolute;
+  top: 96px;
+  left: 14px;
+  width: 172px;
+  z-index: 10;
+  padding: 8px 10px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  line-height: 1.25;
+  transition: transform 0.2s steps(4);
+}
+
+.left-guide-card.collapsed .guide-body-content {
+  display: none;
+}
+
+.guide-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: grab;
+  padding-bottom: 4px;
+  border-bottom: 2px dashed rgba(248, 184, 0, 0.4);
+  margin-bottom: 6px;
+}
+
+.guide-header-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--gold-bright);
+}
+
+.guide-btn-toggle {
+  background: var(--gold-dark);
+  color: #fff;
+  border: 1px solid var(--gold-bright);
+  font-family: 'VT323', monospace;
+  font-size: 16px;
+  width: 20px;
+  height: 18px;
+  line-height: 16px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.guide-btn-toggle:hover {
+  background: var(--gold-amber);
+}
+
+.guide-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0;
+  color: #fff8e8;
+}
+
+.guide-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.guide-divider {
+  height: 2px;
+  background: rgba(248, 184, 0, 0.25);
+  margin: 5px 0;
+}
+
+.kw-gold {
+  color: var(--gold-bright);
+  font-weight: bold;
+  text-shadow: 1px 1px 0 #5c3018;
+}
+
+.guide-carousel-viewport {
+  position: relative;
+  min-height: 44px;
+  overflow: hidden;
+}
+
+.guide-carousel-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s steps(3);
+}
+
+.guide-carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  position: relative;
+}
+
+/* ==========================================================================
+   BẢNG CÔNG ĐỨC BÊN PHẢI (RIGHT MERIT BOARD RETRO RPG STYLE)
+   ========================================================================== */
+.right-merit-card {
+  position: absolute;
+  top: 96px;
+  right: 14px;
+  width: 162px;
+  z-index: 10;
+  padding: 8px 10px;
+  font-family: 'VT323', monospace;
+}
+
+.merit-header {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--gold-bright);
+  text-align: center;
+  padding-bottom: 5px;
+  border-bottom: 2px dashed rgba(248, 184, 0, 0.4);
+  margin-bottom: 6px;
+}
+
+.merit-body {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.merit-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(45, 25, 60, 0.8);
+  padding: 3px 6px;
+  border: 1px solid rgba(248, 184, 0, 0.4);
+  font-size: 17px;
+}
+
+.merit-item-name {
+  color: #fff0d0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 105px;
+}
+
+.merit-item-pts {
+  color: var(--gold-bright);
+  font-weight: bold;
+}
+
+.merit-empty {
+  text-align: center;
+  color: #9f8ba8;
+  font-size: 16px;
+  padding: 8px 0;
+}
+
+/* ==========================================================================
+   SỚ VÀNG HỒI HƯỚNG CÔNG ĐỨC (RETRO RPG DIALOG BOX)
+   ========================================================================== */
+.chant-toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 490px;
+  z-index: 30;
+  pointer-events: none;
+  animation: retro-dialog-appear 0.25s steps(3);
+}
+
+.chant-toast.hidden {
+  display: none;
+}
+
+@keyframes retro-dialog-appear {
+  0% { transform: translate(-50%, -45%) scale(0.85); opacity: 0; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
+.chant-toast-inner {
+  background: rgba(22, 12, 34, 0.96);
+  border: 4px solid var(--gold-bright);
+  box-shadow: 
+    inset -4px -4px 0 0 var(--gold-dark),
+    inset 4px 4px 0 0 #fff3a0,
+    0 0 25px rgba(248, 184, 0, 0.5),
+    6px 6px 0 0 rgba(0, 0, 0, 0.8);
+  padding: 16px 20px;
+  text-align: center;
+}
+
+.chant-toast-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--gold-bright);
+  text-shadow: 2px 2px 0 var(--wood-brown);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--gold-amber);
+}
+
+.chant-toast-text {
+  font-family: 'VT323', monospace;
+  font-size: 24px;
+  line-height: 1.35;
+  color: #fff9ea;
+  text-shadow: 1px 1px 0 #2a1205;
+}
+
+/* ==========================================================================
+   QUICK TOOLBAR (THANH ĐIỀU KHIỂN NHANH DƯỚI ĐÁY)
+   ========================================================================== */
+.quick-toolbar {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  gap: 8px;
+  background: rgba(22, 12, 32, 0.94);
+  padding: 6px 12px;
+  border: 2px solid var(--gold-amber);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+  opacity: 0.15;
+  transition: opacity 0.25s ease;
+}
+
+.quick-toolbar:hover {
+  opacity: 1;
+}
+
+.toolbar-btn {
+  background: #361c48;
+  color: #ffe640;
+  border: 2px solid var(--gold-amber);
+  padding: 5px 10px;
+  font-family: 'VT323', monospace;
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 #0f0716;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover {
+  background: var(--gold-amber);
+  color: #120a1c;
+}
+
+.toolbar-btn.active-pulse {
+  animation: retro-pulse 1s steps(2) infinite;
+}
+
+@keyframes retro-pulse {
+  0% { background: #361c48; }
+  50% { background: #b87800; }
+}
+
+.toolbar-link {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* HIỆU ỨNG THỈNG CHUÔNG RUNG RINH PIXEL (RETRO SCREEN SHAKE) */
+.bell-shake {
+  animation: retro-shake 0.45s steps(4);
+}
+
+@keyframes retro-shake {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3px, 2px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-2px, -2px); }
+  100% { transform: translate(0, 0); }
+}

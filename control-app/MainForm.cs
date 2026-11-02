@@ -29,6 +29,7 @@ namespace ThienDuongControl
         private Button _btnStartServer;
         private Button _btnOpenWebAdmin;
         private Button _btnOpenOverlay;
+        private Button _btnOpenPixelOverlay;
         private PictureBox _picPreview;
         private Label _lblActiveTheme;
 
@@ -144,7 +145,7 @@ namespace ThienDuongControl
         private void InitializeUI()
         {
             this.Text = "Thiền Đường Tịnh Tâm - Bảng Điều Khiển LIVE (WinForms + Node + Three.js Overlay)";
-            this.Size = new Size(1065, 765);
+            this.Size = new Size(1190, 765);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(28, 17, 10);
             this.ForeColor = Color.FromArgb(248, 233, 200);
@@ -178,7 +179,7 @@ namespace ThienDuongControl
                 Location = new Point(18, 38)
             };
 
-            _btnOpenWebAdmin = CreateStyledButton("🌐 Mở Web Admin", new Point(480, 14), new Size(130, 38), Color.FromArgb(30, 105, 175));
+            _btnOpenWebAdmin = CreateStyledButton("🌐 Web Admin", new Point(510, 14), new Size(130, 38), Color.FromArgb(30, 105, 175));
             _btnOpenWebAdmin.Click += (s, e) =>
             {
                 EnsureServerStarted();
@@ -193,17 +194,21 @@ namespace ThienDuongControl
                 }
             };
 
-            _btnStartServer = CreateStyledButton("▶ Khởi Động Server", new Point(618, 14), new Size(165, 38), Color.FromArgb(180, 110, 20));
+            _btnStartServer = CreateStyledButton("▶ Bật Server", new Point(648, 14), new Size(130, 38), Color.FromArgb(180, 110, 20));
             _btnStartServer.Click += (s, e) => EnsureServerStarted();
 
-            _btnOpenOverlay = CreateStyledButton("📱 Mở Overlay 9:16", new Point(790, 14), new Size(170, 38), Color.FromArgb(175, 42, 35));
+            _btnOpenOverlay = CreateStyledButton("📱 Bản 3D", new Point(786, 14), new Size(140, 38), Color.FromArgb(175, 42, 35));
             _btnOpenOverlay.Click += BtnOpenOverlay_Click;
+
+            _btnOpenPixelOverlay = CreateStyledButton("🕹️ Pixel Art 16-Bit", new Point(934, 14), new Size(185, 38), Color.FromArgb(115, 36, 150));
+            _btnOpenPixelOverlay.Click += BtnOpenPixelOverlay_Click;
 
             pnlHeader.Controls.Add(lblTitle);
             pnlHeader.Controls.Add(_lblServerStatus);
             pnlHeader.Controls.Add(_btnOpenWebAdmin);
             pnlHeader.Controls.Add(_btnStartServer);
             pnlHeader.Controls.Add(_btnOpenOverlay);
+            pnlHeader.Controls.Add(_btnOpenPixelOverlay);
             this.Controls.Add(pnlHeader);
 
             // Cột Trái: Chọn 5 Mẫu Thiết Kế + Cấu Hình Giọng Nam Ấm Đọc Kinh
@@ -1189,6 +1194,38 @@ namespace ThienDuongControl
             catch (Exception ex)
             {
                 AppendLog("Lỗi mở trình duyệt: " + ex.Message);
+            }
+        }
+
+        private void BtnOpenPixelOverlay_Click(object sender, EventArgs e)
+        {
+            EnsureServerStarted();
+            try
+            {
+                string pixelUrl = _serverUrl + "/pixel";
+                string[] browsers = new string[]
+                {
+                    @"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe",
+                    @"C:\Program Files\Microsoft\Edge\Application\msedge.exe",
+                    @"C:\Program Files\Google\Chrome\Application\chrome.exe"
+                };
+
+                foreach (string b in browsers)
+                {
+                    if (File.Exists(b))
+                    {
+                        Process.Start(b, "--app=" + pixelUrl + " --window-size=540,960");
+                        AppendLog("🕹️ Đã mở cửa sổ Overlay Pixel Art 16-Bit (540x960).");
+                        return;
+                    }
+                }
+
+                Process.Start(pixelUrl);
+                AppendLog("🕹️ Đã mở Overlay Pixel Art trên trình duyệt mặc định.");
+            }
+            catch (Exception ex)
+            {
+                AppendLog("Lỗi mở Pixel Overlay: " + ex.Message);
             }
         }
 

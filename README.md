@@ -319,3 +319,16 @@ Dự án WinForms được viết tương thích chuẩn C# 5 để biên dịch
 1. Mở [`ThienDuongControl.exe`](ThienDuongControl.exe) (tự động bật Node Server và nạp 723 quà từ TikTok API).
 2. Bấm **📱 Mở Cửa Sổ Overlay 9:16** (hoặc thêm nguồn **Browser / Liên kết** `http://localhost:3000` với kích thước `1080x1920` trong **TikTok LIVE Studio** / **OBS**).
 3. Nhập `@username` kênh TikTok đang bật Live vào ô **🔴 Nhập @ID Kênh TikTok đang Live** rồi bấm **🔗 Kết Nối**.
+
+---
+
+## 9. Phiên Bản Độc Quyền: Pixel Art / Retro 16-Bit Overlay (`http://localhost:3000/pixel`)
+
+Hệ thống tích hợp sẵn một phiên bản **Pixel Art 16-Bit Retro hoài niệm** hoàn toàn không đụng hàng trên TikTok Live:
+- **Ý tưởng thiết kế**: Lấy cảm hứng từ các tựa game Zen Master / RPG 16-bit cổ điển (Chrono Trigger, Golden Sun, EarthBound).
+- **Kiến trúc Chánh Điện 16-bit**: Mái ngói âm dương cong vút, câu đối chữ vàng, tượng Phật Thích Ca dát vàng tỏa hào quang tuần hoàn (palette cycling), bàn thờ Tam Bảo và lư hương nghi ngút khói pixelated.
+- **Hoạt ảnh Sư Trụ Trì gõ mõ**: Tự động vung dùi gõ mõ theo sự kiện `wooden_fish_hit` hoặc nhịp BPM, nốt nhạc bay lên theo nhịp tụng kinh.
+- **19 Skin Thiền Sinh Pixel**: Vẽ bằng thuật toán tạo sprite 16-bit chuyên biệt, cử động thở thiền (Breathing idle) nhẹ nhàng 1-2 pixel.
+- **Hoạt ảnh Cắm Nhang (`adidaphat`)**: Nhân vật bước đi 16-bit walk-cycle lên trước lư hương, cúi lạy 3 xá dâng 3 nén nhang đỏ có lửa bốc khói rồi lùi về vị trí.
+- **Hiệu ứng CRT Scanlines & Sớ Vàng RPG**: Hộp thoại xướng tên công đức thiết kế chuẩn khung hội thoại game nhập vai 16-bit kinh điển.
+- **Tương thích 100%**: Sử dụng chung toàn bộ Socket.IO backend, đồng bộ hoàn hảo với WinForms Control Panel và Web Admin.
