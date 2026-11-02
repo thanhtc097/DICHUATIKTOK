@@ -1,0 +1,209 @@
+{
+  "savedAt": 1793630788522,
+  "currentThemeId": 1,
+  "slotMode": "auto",
+  "currentTier": {
+    "total": 24,
+    "cols": 4,
+    "rows": 6
+  },
+  "seats": [
+    {
+      "index": 0,
+      "row": 0,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 1,
+      "row": 0,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 2,
+      "row": 0,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 3,
+      "row": 0,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 4,
+      "row": 1,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 5,
+      "row": 1,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 6,
+      "row": 1,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 7,
+      "row": 1,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 8,
+      "row": 2,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 9,
+      "row": 2,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 10,
+      "row": 2,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 11,
+      "row": 2,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 12,
+      "row": 3,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 13,
+      "row": 3,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 14,
+      "row": 3,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 15,
+      "row": 3,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 16,
+      "row": 4,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 17,
+      "row": 4,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 18,
+      "row": 4,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 19,
+      "row": 4,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 20,
+      "row": 5,
+      "col": 0,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 21,
+      "row": 5,
+      "col": 1,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 22,
+      "row": 5,
+      "col": 2,
+      "occupied": false,
+      "user": null
+    },
+    {
+      "index": 23,
+      "row": 5,
+      "col": 3,
+      "occupied": false,
+      "user": null
+    }
+  ],
+  "meritList": [],
+  "voiceConfig": {
+    "id": "nam_tram_doc_kinh",
+    "name": "Giọng Nam Trầm Ấm Đọc Kinh (Khuyên dùng)",
+    "voiceName": "vi-VN-NamMinhNeural",
+    "pitchHz": -18,
+    "ratePercent": -20,
+    "reverbLevel": 0.28,
+    "warmthDb": 4.5,
+    "playbackRate": 0.93,
+    "mciSpeed": 930,
+    "woodenFishEnabled": true,
+    "woodenFishBpm": 46,
+    "bellEnabled": true,
+    "bgMusicEnabled": true,
+    "bgMusicTrack": "zen_pentatonic_432",
+    "customMp3Url": "",
+    "bgMusicVolume": 0.38,
+    "autoChantEnabled": true,
+    "autoChantIntervalSec": 120,
+    "meritTemplate": "Nam Mô A Di Đà Phật. Xin thành tâm hồi hướng công đức cho thí chủ {name} đã phát tâm cúng dường {gift}. Nguyện cầu cho thí chủ cùng gia quyến thân tâm an lạc, sở cầu như ý."
+  },
+  "hudConfig": {
+    "guidePosition": "mid_left",
+    "guideOffsetY": 0,
+    "guideOpacity": 0.85,
+    "guideCollapsed": false
+  },
+  "activeTikTokUsername": ""
+}

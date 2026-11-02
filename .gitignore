@@ -1,0 +1,30 @@
+# Runtime state and session data
+server/runtime_state.json
+*.log
+
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# IDE and Editor files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# .NET build artifacts
+bin/
+obj/
