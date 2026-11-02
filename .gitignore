@@ -25,6 +25,10 @@ $RECYCLE.BIN/
 *.userosscache
 *.sln.docstates
 
+# Audio files in root
+/*.mp3
+!overlay/assets/sounds/*.mp3
+
 # .NET build artifacts
 bin/
 obj/

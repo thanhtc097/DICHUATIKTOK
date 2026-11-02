@@ -18,6 +18,9 @@ class TempleAudioEngine {
     this.customAudioEl = null;
     this.isSpeaking = false;
     this.melodyStep = 0;
+    this.bellAudioBuffer = null;
+    this.bellLoading = false;
+    this.preloadBellAudio();
 
     this.config = {
       woodenFishEnabled: true,
@@ -97,14 +100,36 @@ class TempleAudioEngine {
     }
   }
 
-    /**
-   * Tiếng Chuông Đại Hồng Chung Trong Chánh Điện (Grand Temple Bell in Hall)
-   * Tái tạo âm học chuông đồng đại tự chân thực:
-   * 1. Cú thúc chày gỗ lim trầm sâu (Low Wooden Mallet Thump ~82Hz -> 42Hz)
-   * 2. Tiếng va chạm kim khí đanh thép (Metallic Transient Clang 1.2kHz - 3.2kHz)
-   * 3. Âm rền nền 108Hz với hiện tượng giao thoa phách (Acoustic Beating ~1.4Hz "uuummm... uuummm...")
-   * 4. Bồi âm Ngũ Cung Bát Nhã 432Hz ngân dài từ 6 đến 9.8 giây
-   * 5. Vang vọng không gian sảnh đường Chánh Điện (Stereo Temple Hall Convolver Reverb)
+      /**
+   * Nạp trước file âm thanh Chuông Chùa mẫu (bell.mp3) vào bộ nhớ
+   */
+  async preloadBellAudio() {
+    if (this.bellAudioBuffer || this.bellLoading) return;
+    this.bellLoading = true;
+    try {
+      const res = await fetch('/assets/sounds/bell.mp3');
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const arrayBuffer = await res.arrayBuffer();
+
+      if (!this.ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        this.ctx = new AudioCtx();
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.95;
+        this.masterGain.connect(this.ctx.destination);
+      }
+      this.bellAudioBuffer = await this.ctx.decodeAudioData(arrayBuffer);
+      console.log('[AudioEngine] 🔔 Đã nạp thành công file âm thanh Chuông Chùa mẫu (bell.mp3)!');
+    } catch (err) {
+      console.warn('[AudioEngine] Chưa nạp được buffer bell.mp3, sẽ thử lại khi tương tác:', err.message);
+    } finally {
+      this.bellLoading = false;
+    }
+  }
+
+  /**
+   * Tiếng Chuông Đại Hồng Chung Trong Chánh Điện
+   * Phát trực tiếp từ file âm thanh chuông chùa mẫu thật (bell.mp3) với độ ngân sảnh chuẩn xác 100%
    */
   playTempleBell(intensity = 1.0) {
     if (!this.ctx) this.initContext();
@@ -114,98 +139,38 @@ class TempleAudioEngine {
     this.unlocked = true;
     if (!this.config.bellEnabled) return;
 
-    const now = this.ctx.currentTime;
-    const finalInt = Math.max(0.3, Math.min(2.0, intensity));
+    // 1. ƯU TIÊN HÀNG ĐẦU: Phát từ Buffer giải mã file bell.mp3 qua Web Audio API
+    if (this.bellAudioBuffer && this.ctx) {
+      try {
+        const now = this.ctx.currentTime;
+        const src = this.ctx.createBufferSource();
+        src.buffer = this.bellAudioBuffer;
 
-    // Bộ gom âm thanh chuông trước khi xuất ra
-    const bellBus = this.ctx.createGain();
-    bellBus.gain.setValueAtTime(0.95 * finalInt, now);
+        const gain = this.ctx.createGain();
+        const vol = Math.max(0.3, Math.min(2.0, intensity * 1.15));
+        gain.gain.setValueAtTime(vol, now);
 
-    // Kênh trực tiếp (Dry) & Kênh vang sảnh Chánh Điện (Wet Reverb)
-    const dryGain = this.ctx.createGain();
-    dryGain.gain.setValueAtTime(0.72, now);
-    bellBus.connect(dryGain);
-    dryGain.connect(this.masterGain);
+        src.connect(gain);
+        gain.connect(this.masterGain);
 
-    if (this.reverbNode) {
-      const wetGain = this.ctx.createGain();
-      wetGain.gain.setValueAtTime(0.55, now);
-      bellBus.connect(this.reverbNode);
-      this.reverbNode.connect(wetGain);
-      wetGain.connect(this.masterGain);
+        src.start(now);
+        return;
+      } catch (err) {
+        console.warn('[AudioEngine] Buffer Source play error, chuyển fallback HTML5:', err);
+      }
     }
 
-    // 1. CÚ THÚC CHÀY GỖ LIM VÀO VÀNH CHUÔNG (Wooden Strike Thump)
-    const thumpOsc = this.ctx.createOscillator();
-    const thumpGain = this.ctx.createGain();
-    const thumpFilter = this.ctx.createBiquadFilter();
+    // 2. DỰ PHÒNG: Phát qua HTML5 Audio Element để đảm bảo luôn phát ra tiếng chuông ngay cả khi chưa kịp nạp buffer
+    try {
+      const audioEl = new Audio('/assets/sounds/bell.mp3');
+      audioEl.volume = Math.max(0.2, Math.min(1.0, intensity * 0.95));
+      audioEl.play().catch(e => console.warn('[AudioEngine] HTML5 Audio play:', e));
+    } catch (_) {}
 
-    thumpOsc.type = 'triangle';
-    thumpOsc.frequency.setValueAtTime(82, now);
-    thumpOsc.frequency.exponentialRampToValueAtTime(42, now + 0.16);
-
-    thumpFilter.type = 'lowpass';
-    thumpFilter.frequency.setValueAtTime(140, now);
-
-    thumpGain.gain.setValueAtTime(0.001, now);
-    thumpGain.gain.linearRampToValueAtTime(0.85, now + 0.008);
-    thumpGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
-
-    thumpOsc.connect(thumpFilter);
-    thumpFilter.connect(thumpGain);
-    thumpGain.connect(bellBus);
-
-    thumpOsc.start(now);
-    thumpOsc.stop(now + 0.25);
-
-    // 2. TIẾNG VA CHẠM KIM KHÍ ĐỒNG THANH (Metallic Attack Clang)
-    const metallicFreqs = [1280, 1740, 2460, 3180];
-    metallicFreqs.forEach((freq, idx) => {
-      const mOsc = this.ctx.createOscillator();
-      const mGain = this.ctx.createGain();
-      mOsc.type = 'sine';
-      mOsc.frequency.setValueAtTime(freq, now);
-
-      const amp = 0.16 / (idx + 1);
-      mGain.gain.setValueAtTime(0.001, now);
-      mGain.gain.linearRampToValueAtTime(amp, now + 0.004);
-      mGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
-
-      mOsc.connect(mGain);
-      mGain.connect(bellBus);
-      mOsc.start(now);
-      mOsc.stop(now + 0.42);
-    });
-
-    // 3. ÂM RỀN NỀN 108Hz & PHÁCH GIAO THOA (Acoustic Beating ~1.4Hz)
-    const fundamentalPairs = [
-      { freq: 54, amp: 0.35, decay: 8.5 },     // Sub-harmonic trầm sâu
-      { freq: 107.3, amp: 0.58, decay: 9.8 },  // Cặp giao thoa 1
-      { freq: 108.7, amp: 0.58, decay: 9.8 },  // Cặp giao thoa 2 (tạo tiếng "uuummm... uuummm...")
-      { freq: 216, amp: 0.44, decay: 8.2 },    // Bát Nhã octave 1
-      { freq: 272.5, amp: 0.34, decay: 7.5 },  // Quãng 3 thứ (Minor third)
-      { freq: 324, amp: 0.28, decay: 6.8 },    // Quãng 5 (Fifth)
-      { freq: 432, amp: 0.25, decay: 6.2 },    // 432Hz Spiritual Tuning
-      { freq: 540, amp: 0.18, decay: 5.4 },
-      { freq: 648, amp: 0.14, decay: 4.6 },
-      { freq: 864, amp: 0.09, decay: 3.8 }
-    ];
-
-    fundamentalPairs.forEach(p => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(p.freq, now);
-
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(p.amp * 0.48, now + 0.035);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
-
-      osc.connect(gain);
-      gain.connect(bellBus);
-      osc.start(now);
-      osc.stop(now + p.decay + 0.1);
-    });
+    // Nạp sẵn buffer cho các lần thỉnh chuông kế tiếp
+    if (!this.bellAudioBuffer && !this.bellLoading) {
+      this.preloadBellAudio();
+    }
   }
 
 /**
