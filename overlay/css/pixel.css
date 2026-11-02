@@ -1,24 +1,29 @@
 /* ==========================================================================
-   THIỀN ĐƯỜNG TỊNH TÂM — PHIÊN BẢN PIXEL ART / RETRO 16-BIT OVERLAY (9:16)
-   Phong cách Retro Hoài Niệm: RPG 16-bit / Zen Master Pixel World
+   THIỀN ĐƯỜNG TỊNH TÂM — PHONG CÁCH VÕ HIỆP CỔ PHONG 16-BIT RETRO
+   Lấy cảm hứng từ kiệt tác RPG Wuxia: Hero's Adventure (Đại Hiệp Lập Chí Truyện)
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Be+Vietnam+Pro:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=Be+Vietnam+Pro:wght@400;600;700;800&family=Noto+Serif:ital,wght@0,600;0,700;1,400&display=swap');
 
 :root {
-  --bg-deep: #120a1c;
-  --bg-card: rgba(26, 16, 38, 0.92);
-  --gold-amber: #f8b800;
-  --gold-bright: #ffe640;
-  --gold-dark: #b87800;
-  --lotus-pink: #f878a8;
-  --jade-green: #38b878;
-  --wood-brown: #5c3018;
-  --wood-dark: #3a1c0c;
-  --retro-border: #f8b800;
-  --pixel-shadow: #0a0610;
-  --text-primary: #fff8e8;
-  --text-muted: #d0b898;
+  /* Bảng màu Cổ Phong Kiếm Hiệp (Hero's Adventure Palette) */
+  --wuxia-bg-deep: #0e0712;
+  --wuxia-bg-dark: #1a0f1d;
+  --wuxia-wood: #3a1a0d;
+  --wuxia-wood-dark: #240f06;
+  --wuxia-gold-bright: #fce881;
+  --wuxia-gold-rich: #e5b338;
+  --wuxia-gold-amber: #c58c1b;
+  --wuxia-gold-dark: #7a4f08;
+  --wuxia-cinnabar: #b82b1c;      /* Đỏ Chu Sa cổ điển */
+  --wuxia-cinnabar-dark: #78150a;
+  --wuxia-jade: #2ea879;          /* Xanh Ngọc Bích Phỉ Thúy */
+  --wuxia-jade-glow: #64e3b1;
+  --wuxia-parchment: #f6ecdc;     /* Giấy Xuyến Chỉ cổ ngả vàng */
+  --wuxia-parchment-border: #8c5d2b;
+  --text-wuxia-bright: #fffdf5;
+  --text-wuxia-gold: #fce881;
+  --text-wuxia-muted: #d4b896;
 }
 
 * {
@@ -36,15 +41,17 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background-color: var(--bg-deep);
-  font-family: 'VT323', 'Be Vietnam Pro', monospace;
-  color: var(--text-primary);
+  background-color: var(--wuxia-bg-deep);
+  font-family: 'VT323', 'Noto Serif', 'Be Vietnam Pro', serif;
+  color: var(--text-wuxia-bright);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* KHUNG HIỂN THỊ CHUẨN 9:16 (540x960 hoặc scale tối đa theo chiều cao) */
+/* ==========================================================================
+   KHUNG CHUẨN DỌC 9:16 (540x960 HOẶC CO GIÃN TỐI ĐA TRÊN OBS / MANICAM)
+   ========================================================================== */
 #stage-container {
   position: relative;
   width: 540px;
@@ -52,12 +59,13 @@ html, body {
   max-width: 100vw;
   max-height: 100vh;
   aspect-ratio: 9 / 16;
-  background-color: #1a0f26;
+  background-color: #160c18;
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(248, 184, 0, 0.2);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 20px rgba(229, 179, 56, 0.25);
+  border: 2px solid var(--wuxia-wood);
 }
 
-/* LỚP CANVAS PIXEL ART CHÍNH */
+/* LỚP CANVAS CHÍNH */
 #pixel-canvas {
   position: absolute;
   top: 0;
@@ -70,7 +78,7 @@ html, body {
   image-rendering: crisp-edges;
 }
 
-/* LỚP SCANLINES CRT RETRO (HIỆU ỨNG TIVI HOÀI NIỆM) */
+/* LỚP LỌC MÀU VÕ HIỆP CỔ PHONG (SUBTLE VINTAGE WUXIA GLOW) */
 .scanlines-overlay {
   position: absolute;
   top: 0;
@@ -79,38 +87,70 @@ html, body {
   height: 100%;
   z-index: 2;
   pointer-events: none;
-  background: linear-gradient(
-    rgba(18, 10, 28, 0) 50%, 
-    rgba(0, 0, 0, 0.22) 50%
-  );
-  background-size: 100% 4px;
-  opacity: 0.65;
+  background: 
+    radial-gradient(circle at 50% 30%, rgba(245, 190, 50, 0.06), transparent 70%),
+    linear-gradient(rgba(14, 7, 18, 0) 50%, rgba(0, 0, 0, 0.18) 50%);
+  background-size: 100% 100%, 100% 4px;
+  opacity: 0.85;
 }
 
 /* ==========================================================================
-   VIỀN PIXEL RETRO BEVEL (BOX-SHADOW BẬC THANG 16-BIT)
+   KHUNG VIỀN CỔ PHONG KIẾM HIỆP (WUXIA JADE & GOLD TABLET)
    ========================================================================== */
-.pixel-box {
-  background: var(--bg-card);
-  border: 3px solid var(--retro-border);
+.wuxia-box {
+  background: rgba(24, 13, 26, 0.94);
+  border: 3px solid var(--wuxia-gold-rich);
   box-shadow: 
-    inset -3px -3px 0 0 var(--gold-dark),
-    inset 3px 3px 0 0 var(--gold-bright),
-    3px 3px 0 0 var(--pixel-shadow);
-  border-radius: 0;
+    inset -3px -3px 0 0 var(--wuxia-gold-dark),
+    inset 3px 3px 0 0 var(--wuxia-gold-bright),
+    0 4px 15px rgba(0, 0, 0, 0.75),
+    0 0 10px rgba(229, 179, 56, 0.2);
+  position: relative;
 }
 
-.pixel-box-sm {
-  background: rgba(36, 20, 52, 0.95);
-  border: 2px solid var(--gold-amber);
+/* Góc Hồi Văn Cổ Điển 4 góc */
+.wuxia-box::before {
+  content: "❖";
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  font-size: 14px;
+  color: var(--wuxia-gold-bright);
+  text-shadow: 1px 1px 0 var(--wuxia-wood-dark);
+}
+
+.wuxia-box::after {
+  content: "❖";
+  position: absolute;
+  bottom: -8px;
+  right: -8px;
+  font-size: 14px;
+  color: var(--wuxia-gold-bright);
+  text-shadow: 1px 1px 0 var(--wuxia-wood-dark);
+}
+
+/* Dấu Ấn Triện Son Chu Sa (Red Vermilion Seal Stamp) */
+.seal-stamp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: var(--wuxia-cinnabar);
+  border: 2px solid #ff7b72;
   box-shadow: 
-    inset -2px -2px 0 0 var(--gold-dark),
-    inset 2px 2px 0 0 var(--gold-bright),
-    2px 2px 0 0 var(--pixel-shadow);
+    inset 1px 1px 0 0 #ff9990,
+    inset -1px -1px 0 0 var(--wuxia-cinnabar-dark),
+    2px 2px 0 0 rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-family: 'Noto Serif', serif;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1;
 }
 
 /* ==========================================================================
-   TOP HUD: BANNER CHÙA PIXEL & ĐỒNG HỒ / BỘ ĐẾM 16-BIT
+   TOP HUD: BANNER THIẾU LÂM CỔ TỰ & BỘ ĐẾM THỜI GIAN VÕ LÂM
    ========================================================================== */
 .top-hud {
   position: absolute;
@@ -128,43 +168,38 @@ html, body {
   pointer-events: auto;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 14px;
-  background: rgba(28, 14, 40, 0.92);
-  border: 3px solid var(--gold-amber);
+  gap: 12px;
+  padding: 6px 16px;
+  background: linear-gradient(180deg, rgba(38, 20, 42, 0.96) 0%, rgba(22, 10, 24, 0.96) 100%);
+  border: 3px solid var(--wuxia-gold-rich);
   box-shadow: 
-    inset -3px -3px 0 0 var(--gold-dark),
-    inset 3px 3px 0 0 var(--gold-bright),
-    3px 3px 0 0 rgba(0, 0, 0, 0.6);
+    inset -3px -3px 0 0 var(--wuxia-gold-dark),
+    inset 3px 3px 0 0 var(--wuxia-gold-bright),
+    0 0 16px rgba(229, 179, 56, 0.35),
+    3px 3px 0 0 rgba(0, 0, 0, 0.7);
 }
 
-.banner-lotus-pixel {
-  font-size: 26px;
-  line-height: 1;
-  color: var(--lotus-pink);
-  filter: drop-shadow(0 0 6px rgba(248, 120, 168, 0.6));
-  animation: pulse-lotus 2.4s ease-in-out infinite alternate;
-}
-
-@keyframes pulse-lotus {
-  0% { transform: scale(1); filter: drop-shadow(0 0 4px var(--lotus-pink)); }
-  100% { transform: scale(1.15); filter: drop-shadow(0 0 10px var(--gold-bright)); }
+.banner-seal-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .banner-texts h1 {
   font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
-  letter-spacing: 0.5px;
-  color: var(--gold-bright);
-  text-shadow: 2px 2px 0 #5c3018, 0 0 8px rgba(255, 230, 64, 0.5);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: var(--wuxia-gold-bright);
+  text-shadow: 2px 2px 0 var(--wuxia-wood-dark), 0 0 10px rgba(252, 232, 129, 0.5);
   margin-bottom: 2px;
 }
 
 .banner-texts p {
   font-family: 'VT323', monospace;
-  font-size: 19px;
-  color: #fff0c0;
-  letter-spacing: 1px;
+  font-size: 20px;
+  color: #fff4d4;
+  letter-spacing: 1.5px;
+  text-shadow: 1px 1px 0 #1f0c05;
 }
 
 .status-pills {
@@ -177,56 +212,56 @@ html, body {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
-  background: rgba(28, 14, 40, 0.92);
-  border: 2px solid var(--gold-amber);
+  padding: 5px 11px;
+  background: rgba(28, 14, 32, 0.95);
+  border: 2px solid var(--wuxia-gold-rich);
   box-shadow: 
-    inset -2px -2px 0 0 var(--gold-dark),
-    inset 2px 2px 0 0 var(--gold-bright),
-    2px 2px 0 0 rgba(0, 0, 0, 0.6);
+    inset -2px -2px 0 0 var(--wuxia-gold-dark),
+    inset 2px 2px 0 0 var(--wuxia-gold-bright),
+    2px 2px 0 0 rgba(0, 0, 0, 0.7);
   font-family: 'VT323', monospace;
   font-size: 20px;
 }
 
-.pixel-blinking-dot {
-  width: 8px;
-  height: 8px;
-  background-color: var(--jade-green);
-  box-shadow: 0 0 6px var(--jade-green);
+.jade-qi-dot {
+  width: 9px;
+  height: 9px;
+  background-color: var(--wuxia-jade);
+  box-shadow: 0 0 8px var(--wuxia-jade-glow);
   display: inline-block;
-  animation: pixel-blink 1.2s steps(2, start) infinite;
+  animation: qi-pulse 1.4s steps(3, start) infinite;
 }
 
-@keyframes pixel-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
+@keyframes qi-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 4px var(--wuxia-jade)); }
+  50% { transform: scale(0.85); opacity: 0.35; }
 }
 
 .status-pill strong {
-  color: #ffffff;
+  color: var(--wuxia-gold-bright);
   font-weight: normal;
+  text-shadow: 1px 1px 0 #000;
 }
 
 .status-pill .pill-sub {
   font-size: 14px;
-  color: var(--text-muted);
+  color: var(--text-wuxia-muted);
   line-height: 1;
 }
 
 /* ==========================================================================
-   BẢNG HƯỚNG DẪN BÊN TRÁI (LEFT GUIDE CARD RETRO)
+   BẢNG QUY TẮC GIANG HỒ BÊN TRÁI (LEFT WUXIA GUIDE SCROLL)
    ========================================================================== */
 .left-guide-card {
   position: absolute;
   top: 96px;
   left: 14px;
-  width: 172px;
+  width: 178px;
   z-index: 10;
   padding: 8px 10px;
   font-family: 'VT323', monospace;
-  font-size: 18px;
+  font-size: 19px;
   line-height: 1.25;
-  transition: transform 0.2s steps(4);
 }
 
 .left-guide-card.collapsed .guide-body-content {
@@ -238,21 +273,22 @@ html, body {
   justify-content: space-between;
   align-items: center;
   cursor: grab;
-  padding-bottom: 4px;
-  border-bottom: 2px dashed rgba(248, 184, 0, 0.4);
+  padding-bottom: 5px;
+  border-bottom: 2px dashed rgba(229, 179, 56, 0.45);
   margin-bottom: 6px;
 }
 
 .guide-header-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  color: var(--gold-bright);
+  font-size: 8.5px;
+  color: var(--wuxia-gold-bright);
+  text-shadow: 1px 1px 0 var(--wuxia-wood-dark);
 }
 
 .guide-btn-toggle {
-  background: var(--gold-dark);
+  background: var(--wuxia-cinnabar);
   color: #fff;
-  border: 1px solid var(--gold-bright);
+  border: 1px solid var(--wuxia-gold-rich);
   font-family: 'VT323', monospace;
   font-size: 16px;
   width: 20px;
@@ -263,7 +299,7 @@ html, body {
 }
 
 .guide-btn-toggle:hover {
-  background: var(--gold-amber);
+  background: #d63031;
 }
 
 .guide-block {
@@ -271,7 +307,7 @@ html, body {
   align-items: center;
   gap: 6px;
   margin: 4px 0;
-  color: #fff8e8;
+  color: #fffdf5;
 }
 
 .guide-icon {
@@ -281,19 +317,24 @@ html, body {
 
 .guide-divider {
   height: 2px;
-  background: rgba(248, 184, 0, 0.25);
+  background: rgba(229, 179, 56, 0.3);
   margin: 5px 0;
 }
 
-.kw-gold {
-  color: var(--gold-bright);
+.kw-wuxia-gold {
+  color: var(--wuxia-gold-bright);
   font-weight: bold;
-  text-shadow: 1px 1px 0 #5c3018;
+  text-shadow: 1px 1px 0 var(--wuxia-wood);
+}
+
+.kw-wuxia-red {
+  color: #ff7675;
+  font-weight: bold;
 }
 
 .guide-carousel-viewport {
   position: relative;
-  min-height: 44px;
+  min-height: 48px;
   overflow: hidden;
 }
 
@@ -304,7 +345,7 @@ html, body {
   width: 100%;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s steps(3);
+  transition: opacity 0.35s steps(3);
 }
 
 .guide-carousel-slide.active {
@@ -314,13 +355,13 @@ html, body {
 }
 
 /* ==========================================================================
-   BẢNG CÔNG ĐỨC BÊN PHẢI (RIGHT MERIT BOARD RETRO RPG STYLE)
+   BẢNG CÔNG ĐỨC GIANG HỒ BÊN PHẢI (HERO'S MERIT BOARD)
    ========================================================================== */
 .right-merit-card {
   position: absolute;
   top: 96px;
   right: 14px;
-  width: 162px;
+  width: 168px;
   z-index: 10;
   padding: 8px 10px;
   font-family: 'VT323', monospace;
@@ -328,12 +369,13 @@ html, body {
 
 .merit-header {
   font-family: 'Press Start 2P', monospace;
-  font-size: 9px;
-  color: var(--gold-bright);
+  font-size: 8.5px;
+  color: var(--wuxia-gold-bright);
   text-align: center;
   padding-bottom: 5px;
-  border-bottom: 2px dashed rgba(248, 184, 0, 0.4);
+  border-bottom: 2px dashed rgba(229, 179, 56, 0.45);
   margin-bottom: 6px;
+  text-shadow: 1px 1px 0 var(--wuxia-wood-dark);
 }
 
 .merit-body {
@@ -346,89 +388,117 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(45, 25, 60, 0.8);
+  background: rgba(42, 22, 48, 0.85);
   padding: 3px 6px;
-  border: 1px solid rgba(248, 184, 0, 0.4);
-  font-size: 17px;
+  border: 1px solid rgba(229, 179, 56, 0.45);
+  font-size: 18px;
 }
 
 .merit-item-name {
-  color: #fff0d0;
+  color: #fff6e0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 105px;
+  max-width: 110px;
 }
 
 .merit-item-pts {
-  color: var(--gold-bright);
+  color: var(--wuxia-gold-bright);
   font-weight: bold;
+  text-shadow: 1px 1px 0 #000;
 }
 
 .merit-empty {
   text-align: center;
-  color: #9f8ba8;
-  font-size: 16px;
+  color: #a894b0;
+  font-size: 17px;
   padding: 8px 0;
 }
 
 /* ==========================================================================
-   SỚ VÀNG HỒI HƯỚNG CÔNG ĐỨC (RETRO RPG DIALOG BOX)
+   SỚ VÀNG CUỘN TRỤC HOÀNG KIM (WUXIA IMPERIAL BUDDHIST SCROLL)
    ========================================================================== */
 .chant-toast {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 490px;
+  width: 92%;
+  max-width: 500px;
   z-index: 30;
   pointer-events: none;
-  animation: retro-dialog-appear 0.25s steps(3);
+  animation: scroll-open 0.3s steps(4);
 }
 
 .chant-toast.hidden {
   display: none;
 }
 
-@keyframes retro-dialog-appear {
-  0% { transform: translate(-50%, -45%) scale(0.85); opacity: 0; }
+@keyframes scroll-open {
+  0% { transform: translate(-50%, -50%) scaleX(0.1) scaleY(0.9); opacity: 0; }
+  60% { transform: translate(-50%, -50%) scaleX(1.05) scaleY(1); opacity: 1; }
   100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 .chant-toast-inner {
-  background: rgba(22, 12, 34, 0.96);
-  border: 4px solid var(--gold-bright);
+  background: linear-gradient(180deg, #1f0e22 0%, #150918 100%);
+  border: 4px solid var(--wuxia-gold-rich);
   box-shadow: 
-    inset -4px -4px 0 0 var(--gold-dark),
-    inset 4px 4px 0 0 #fff3a0,
-    0 0 25px rgba(248, 184, 0, 0.5),
-    6px 6px 0 0 rgba(0, 0, 0, 0.8);
-  padding: 16px 20px;
+    inset -4px -4px 0 0 var(--wuxia-gold-dark),
+    inset 4px 4px 0 0 var(--wuxia-gold-bright),
+    0 0 35px rgba(229, 179, 56, 0.55),
+    8px 8px 0 0 rgba(0, 0, 0, 0.85);
+  padding: 16px 22px;
   text-align: center;
+  position: relative;
+}
+
+/* Hai Trục Gấm Cuộn Tranh Hai Bên */
+.chant-toast-inner::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: -12px;
+  width: 10px;
+  background: var(--wuxia-gold-amber);
+  border: 2px solid var(--wuxia-wood);
+  box-shadow: inset 2px 2px 0 0 var(--wuxia-gold-bright);
+}
+
+.chant-toast-inner::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  right: -12px;
+  width: 10px;
+  background: var(--wuxia-gold-amber);
+  border: 2px solid var(--wuxia-wood);
+  box-shadow: inset 2px 2px 0 0 var(--wuxia-gold-bright);
 }
 
 .chant-toast-title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--gold-bright);
-  text-shadow: 2px 2px 0 var(--wood-brown);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--wuxia-gold-bright);
+  text-shadow: 2px 2px 0 var(--wuxia-wood-dark), 0 0 8px rgba(252, 232, 129, 0.6);
   margin-bottom: 12px;
   padding-bottom: 8px;
-  border-bottom: 2px solid var(--gold-amber);
+  border-bottom: 2px solid var(--wuxia-gold-rich);
 }
 
 .chant-toast-text {
   font-family: 'VT323', monospace;
-  font-size: 24px;
+  font-size: 26px;
   line-height: 1.35;
-  color: #fff9ea;
-  text-shadow: 1px 1px 0 #2a1205;
+  color: #fffaf0;
+  text-shadow: 2px 2px 0 #180903;
 }
 
 /* ==========================================================================
-   QUICK TOOLBAR (THANH ĐIỀU KHIỂN NHANH DƯỚI ĐÁY)
+   QUICK TOOLBAR (THANH LỆNH BÀI NHANH DƯỚI ĐÁY)
    ========================================================================== */
 .quick-toolbar {
   position: absolute;
@@ -438,11 +508,11 @@ html, body {
   z-index: 20;
   display: flex;
   gap: 8px;
-  background: rgba(22, 12, 32, 0.94);
-  padding: 6px 12px;
-  border: 2px solid var(--gold-amber);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-  opacity: 0.15;
+  background: rgba(22, 11, 26, 0.95);
+  padding: 6px 14px;
+  border: 2px solid var(--wuxia-gold-rich);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.85);
+  opacity: 0.18;
   transition: opacity 0.25s ease;
 }
 
@@ -451,29 +521,29 @@ html, body {
 }
 
 .toolbar-btn {
-  background: #361c48;
-  color: #ffe640;
-  border: 2px solid var(--gold-amber);
-  padding: 5px 10px;
+  background: #3c1e44;
+  color: var(--wuxia-gold-bright);
+  border: 2px solid var(--wuxia-gold-rich);
+  padding: 5px 11px;
   font-family: 'VT323', monospace;
-  font-size: 18px;
+  font-size: 19px;
   cursor: pointer;
-  box-shadow: 2px 2px 0 #0f0716;
+  box-shadow: 2px 2px 0 #0d0610;
   white-space: nowrap;
 }
 
 .toolbar-btn:hover {
-  background: var(--gold-amber);
-  color: #120a1c;
+  background: var(--wuxia-gold-rich);
+  color: #120716;
 }
 
 .toolbar-btn.active-pulse {
-  animation: retro-pulse 1s steps(2) infinite;
+  animation: wuxia-pulse 1.2s steps(2) infinite;
 }
 
-@keyframes retro-pulse {
-  0% { background: #361c48; }
-  50% { background: #b87800; }
+@keyframes wuxia-pulse {
+  0% { background: #3c1e44; }
+  50% { background: var(--wuxia-gold-dark); }
 }
 
 .toolbar-link {
@@ -482,15 +552,15 @@ html, body {
   align-items: center;
 }
 
-/* HIỆU ỨNG THỈNG CHUÔNG RUNG RINH PIXEL (RETRO SCREEN SHAKE) */
+/* HIỆU ỨNG SƠN HÀ RUNG CHUYỂN KHI THỈNG ĐẠI HỒNG CHUNG */
 .bell-shake {
-  animation: retro-shake 0.45s steps(4);
+  animation: wuxia-shake 0.48s steps(4);
 }
 
-@keyframes retro-shake {
+@keyframes wuxia-shake {
   0% { transform: translate(0, 0); }
-  25% { transform: translate(-3px, 2px); }
-  50% { transform: translate(3px, -2px); }
-  75% { transform: translate(-2px, -2px); }
+  25% { transform: translate(-4px, 2px); }
+  50% { transform: translate(4px, -2px); }
+  75% { transform: translate(-2px, -3px); }
   100% { transform: translate(0, 0); }
 }

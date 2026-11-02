@@ -1,7 +1,9 @@
 /**
  * ============================================================================
- * BỘ DỰNG CẢNH CHÁNH ĐIỆN PIXEL ART / RETRO 16-BIT (PixelSceneRenderer)
- * Tái hiện thế giới thiền định bằng phong cách đồ họa hoài niệm RPG 16-bit / SNES.
+ * ENGINE ĐỒ HỌA VÕ HIỆP CỔ PHONG 16-BIT (PixelSceneRenderer - Wuxia Edition)
+ * Lấy cảm hứng từ kiệt tác RPG: Hero's Adventure: Road to Passion (Đại Hiệp Lập Chí Truyện)
+ * Tái hiện không gian Thiếu Lâm Tự cổ phong, Chibi Wuxia Sprites, Khí công đả tọa,
+ * Chân hương nghi ngút và Khinh công dâng lễ Tam Bảo.
  * ============================================================================
  */
 
@@ -19,12 +21,12 @@ class PixelSceneRenderer {
     this.gridRows = 6;
     this.totalSeats = 24;
 
-    this.burstEffects = []; // { x, y, radius, maxRadius, color, life, maxLife }
+    this.burstEffects = []; // Vụ nổ hoa sen phước lành
     this.incenseOfferings = new Map(); // seatIndex -> animation state
     this.woodenFishPulse = 0; // 0..1 khi gõ mõ
-    this.bellRings = []; // Các vòng sóng âm chuông pixel
+    this.bellRings = []; // Các vòng sóng âm thiền đạo
 
-    // Hạt khí quyển pixel (Cánh sen, Bụi vàng, Đom đóm)
+    // Hạt khí quyển Cổ Phong (Cánh sen rơi, Chân khí lơ lửng, Tàn nhang bay)
     this.particles = [];
     this.initAtmosphereParticles();
 
@@ -48,23 +50,22 @@ class PixelSceneRenderer {
     this.scaleX = this.canvas.width / this.virtualWidth;
     this.scaleY = this.canvas.height / this.virtualHeight;
 
-    // Giữ nét vẽ pixel sắc cạnh không bị mờ
     this.ctx.imageSmoothingEnabled = false;
   }
 
   initAtmosphereParticles() {
     this.particles = [];
-    const count = 38;
+    const count = 46;
     for (let i = 0; i < count; i++) {
       this.particles.push({
         x: Math.random() * this.virtualWidth,
         y: Math.random() * this.virtualHeight,
-        type: i % 3 === 0 ? 'lotus' : (i % 3 === 1 ? 'gold_dust' : 'firefly'),
+        type: i % 4 === 0 ? 'lotus_petal' : (i % 4 === 1 ? 'qi_ember' : (i % 4 === 2 ? 'gold_spark' : 'zen_mist')),
         size: 2 + Math.floor(Math.random() * 3),
-        speedY: 0.25 + Math.random() * 0.45,
-        speedX: (Math.random() - 0.5) * 0.35,
+        speedY: 0.2 + Math.random() * 0.45,
+        speedX: (Math.random() - 0.5) * 0.4,
         phase: Math.random() * Math.PI * 2,
-        color: i % 3 === 0 ? '#f878a8' : (i % 3 === 1 ? '#ffe640' : '#7ce0ff')
+        color: i % 4 === 0 ? '#f878a8' : (i % 4 === 1 ? '#ff7675' : (i % 4 === 2 ? '#fce881' : '#64e3b1'))
       });
     }
   }
@@ -76,17 +77,17 @@ class PixelSceneRenderer {
     this.totalSeats = (seats && seats.length) ? seats.length : (cols * rows);
   }
 
-  triggerSeatBurst(seatIndex, color = '#ffe640') {
+  triggerSeatBurst(seatIndex, color = '#fce881') {
     const pos = this.getSeatScreenPosition(seatIndex);
     if (!pos) return;
     this.burstEffects.push({
       x: pos.x,
       y: pos.y,
       radius: 4,
-      maxRadius: 42,
+      maxRadius: 46,
       color: color,
       life: 1.0,
-      decay: 0.025
+      decay: 0.022
     });
   }
 
@@ -94,10 +95,10 @@ class PixelSceneRenderer {
     this.bellRings.push({
       x: this.virtualWidth * 0.5,
       y: 195,
-      radius: 10,
-      maxRadius: 360,
+      radius: 12,
+      maxRadius: 380,
       life: 1.0,
-      decay: 0.016
+      decay: 0.015
     });
 
     const stage = document.getElementById('stage-container');
@@ -118,13 +119,13 @@ class PixelSceneRenderer {
 
     this.incenseOfferings.set(seatIndex, {
       seatIndex,
-      user: user || { nickname: 'Phật Tử', skin: 'nam' },
+      user: user || { nickname: 'Hiệp Khách', skin: 'nam' },
       startTime: performance.now(),
       startX: startPos.x,
       startY: startPos.y,
       targetX: this.virtualWidth * 0.5,
-      targetY: 345, // Trước lư hương Chánh điện
-      durationTotal: 8800 // 8.8 giây cho cả chu trình
+      targetY: 340, // Trước Lư Hương Thiếu Lâm
+      durationTotal: 8600
     });
   }
 
@@ -136,20 +137,16 @@ class PixelSceneRenderer {
     const row = Math.floor(index / cols);
     const col = index % cols;
 
-    // Phép chiếu phối cảnh bậc thang hoài niệm 16-bit
+    // Phép chiếu phối cảnh hình thang đả tọa Cổ Phong
     const t = rows > 1 ? (row / (rows - 1)) : 0.5;
-    
-    // Y bắt đầu từ dưới bục Thầy (y ~ 440) nở dần xuống đáy (y ~ 910)
-    const y = 430 + (470 * Math.pow(t, 1.08));
+    const y = 435 + (465 * Math.pow(t, 1.08));
 
-    // Bề rộng hàng mở rộng dần theo chiều sâu (hình thang phối cảnh)
     const rowWidth = this.virtualWidth * (0.64 + 0.32 * t);
     const startX = (this.virtualWidth - rowWidth) * 0.5;
     const stepX = cols > 1 ? (rowWidth / (cols - 1)) : 0;
     const x = startX + col * stepX;
 
-    // Hệ số co giãn theo chiều sâu và số ghế
-    const depthScale = (0.76 + 0.28 * t) * Math.min(1.0, Math.sqrt(24 / Math.max(24, this.totalSeats)));
+    const depthScale = (0.78 + 0.26 * t) * Math.min(1.0, Math.sqrt(24 / Math.max(24, this.totalSeats)));
 
     return { x: Math.round(x), y: Math.round(y), scale: depthScale, row, col };
   }
@@ -161,34 +158,34 @@ class PixelSceneRenderer {
     this.time = currentTime * 0.001;
 
     if (this.woodenFishPulse > 0) {
-      this.woodenFishPulse = Math.max(0, this.woodenFishPulse - 0.06);
+      this.woodenFishPulse = Math.max(0, this.woodenFishPulse - 0.05);
     }
 
     this.ctx.save();
     this.ctx.scale(this.scaleX, this.scaleY);
 
-    // 1. Vẽ Nền Chánh Điện Pixel Art 16-bit
-    this.drawPixelTempleBackground();
+    // 1. Bình Phong Thủy Mặc & Kiến Trúc Chánh Điện Thiếu Lâm
+    this.drawWuxiaTempleBackground();
 
-    // 2. Vẽ Tượng Đức Phật Thích Ca Mâu Ni & Hào Quang 16-bit
-    this.drawPixelBuddhaStatue();
+    // 2. Đại Kim Thân Phật Thích Ca Mâu Ni & Hào Quang Cửu Phẩm
+    this.drawWuxiaBuddhaStatue();
 
-    // 3. Vẽ Bàn Thờ Tam Bảo & Lư Hương Nghi Ngút Khói 16-bit
-    this.drawPixelAltarAndIncense();
+    // 3. Bàn Thờ Tam Bảo, Lư Đồng Bát Quái & Khói Trầm Long Quy
+    this.drawWuxiaAltarAndIncense();
 
-    // 4. Vẽ Hàng 3 Vị Sư Thầy Tọa Thiền & Gõ Mõ
-    this.drawHeadMonks();
+    // 4. Hàng 3 Vị Thiếu Lâm Cao Tăng (Phương Trượng Đại Sư gõ Mõ Long Ngư)
+    this.drawWuxiaHeadMonks();
 
-    // 5. Vẽ Lưới Bồ Đoàn & Thiền Sinh (24..100 Chỗ)
-    this.drawSeatsAndMeditators();
+    // 5. Lưới Bồ Đoàn & Chibi Wuxia Sprites Đả Tọa (24..100 Hiệp Khách)
+    this.drawSeatsAndWuxiaMeditators();
 
-    // 6. Vẽ Hoạt Ảnh Người Bước Lên Cắm Nhang (Incense Walk Cycle)
+    // 6. Hoạt Ảnh Khinh Công Lướt Lên Cắm Nhang (Incense Walk Cycle)
     this.drawIncenseOfferings();
 
-    // 7. Vẽ Sóng Âm Đại Hồng Chung & Vụ Nổ Sao Tặng Quà
+    // 7. Sóng Âm Thiền Đạo & Trận Pháp Hoa Sen Vàng Bùng Nổ
     this.drawVisualEffects();
 
-    // 8. Vẽ Bụi Vàng & Cánh Sen Rơi Bầu Khí Quyển
+    // 8. Cánh Sen, Tàn Nhang & Chân Khí Bầu Khí Quyển
     this.drawAtmosphereParticles();
 
     this.ctx.restore();
@@ -196,348 +193,423 @@ class PixelSceneRenderer {
   }
 
   // ==========================================================================
-  // 1. NỀN CHÁNH ĐIỆN CHÙA PIXEL ART (Kiến trúc cổ Việt Nam 16-bit)
+  // 1. KIẾN TRÚC THIẾU LÂM TỰ & BÌNH PHONG SƠN THỦY MẶC (Hero's Adventure)
   // ==========================================================================
-  drawPixelTempleBackground() {
+  drawWuxiaTempleBackground() {
     const ctx = this.ctx;
     const W = this.virtualWidth;
     const H = this.virtualHeight;
 
-    // Bầu trời đêm tĩnh lặng / tường chánh điện
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#12081e');
-    grad.addColorStop(0.35, '#220f32');
-    grad.addColorStop(0.55, '#351838');
-    grad.addColorStop(1, '#1b0e24');
-    ctx.fillStyle = grad;
+    // Không gian Chánh điện cổ kính u trầm
+    const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+    bgGrad.addColorStop(0, '#0c0610');
+    bgGrad.addColorStop(0.32, '#1a0d1e');
+    bgGrad.addColorStop(0.55, '#281324');
+    bgGrad.addColorStop(1, '#150915');
+    ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, W, H);
 
-    // Mái ngói Chùa cổ cong vút (Mái ngói âm dương pixelated)
-    ctx.fillStyle = '#6b2014'; // Đỏ gạch nung cổ
+    // BỨC BÌNH PHONG SƠN THỦY MẶC KHỔNG LỒ (Giant Ink-Wash Mountain Screen)
+    ctx.fillStyle = '#1c101c';
+    ctx.fillRect(40, 52, W - 80, 240);
+    ctx.strokeStyle = '#8a5c24';
+    ctx.lineWidth = 3;
+    ctx.strokeRect(40, 52, W - 80, 240);
+
+    // Vẽ dãy núi đá thủy mặc cuộn sương mù (Ink Wash Mountains)
+    ctx.fillStyle = '#2d1b2b';
     ctx.beginPath();
-    ctx.moveTo(10, 80);
-    ctx.lineTo(80, 50);
-    ctx.lineTo(W - 80, 50);
-    ctx.lineTo(W - 10, 80);
-    ctx.lineTo(W - 40, 105);
-    ctx.lineTo(40, 105);
+    ctx.moveTo(42, 288);
+    ctx.lineTo(85, 175);
+    ctx.lineTo(145, 230);
+    ctx.lineTo(210, 140);
+    ctx.lineTo(270, 220);
+    ctx.lineTo(340, 155);
+    ctx.lineTo(410, 240);
+    ctx.lineTo(W - 44, 185);
+    ctx.lineTo(W - 44, 288);
     ctx.closePath();
     ctx.fill();
 
-    // Viền ngói vàng thếp ngọc
-    ctx.fillStyle = '#e8a820';
-    ctx.fillRect(35, 102, W - 70, 5);
-    ctx.fillRect(75, 48, W - 150, 4);
+    // Vầng trăng tròn mờ ảo sau rặng núi (Zen Full Moon)
+    ctx.fillStyle = 'rgba(252, 232, 129, 0.18)';
+    ctx.beginPath();
+    ctx.arc(W * 0.5, 145, 48, 0, Math.PI * 2);
+    ctx.fill();
 
-    // Đầu đao mái chùa cong vút 2 bên (Đặc trưng chùa Việt)
-    this.drawPixelTileEdge(8, 76, true);
-    this.drawPixelTileEdge(W - 24, 76, false);
+    // MÁI ĐAO CHÙA CỔ VỌNG NGUYỆT ĐẬM CHẤT KIẾM HIỆP
+    ctx.fillStyle = '#4a150e'; // Ngói cổ nâu đỏ sẫm
+    ctx.beginPath();
+    ctx.moveTo(8, 75);
+    ctx.lineTo(75, 45);
+    ctx.lineTo(W - 75, 45);
+    ctx.lineTo(W - 8, 75);
+    ctx.lineTo(W - 36, 102);
+    ctx.lineTo(36, 102);
+    ctx.closePath();
+    ctx.fill();
 
-    // Hai Cột Gỗ Lim To Chống Chánh Điện
-    ctx.fillStyle = '#421f14';
-    ctx.fillRect(20, 105, 30, 480);
-    ctx.fillRect(W - 50, 105, 30, 480);
+    // Viền ngói thếp vàng & Xà gồ chạm trổ
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(32, 98, W - 64, 5);
+    ctx.fillRect(70, 43, W - 140, 4);
 
-    // Khắc câu đối chữ vàng trên cột gỗ
-    ctx.fillStyle = '#f8b800';
-    ctx.fillRect(24, 110, 22, 5);
-    ctx.fillRect(W - 46, 110, 22, 5);
-    this.drawCoupletLetters(28, 140, ['TÂM', 'TỰA', 'LIÊN', 'HOA', 'TỊNH']);
-    this.drawCoupletLetters(W - 42, 140, ['ĐỨC', 'NHƯ', 'ĐẠI', 'HẢI', 'THÂM']);
+    // Hai đầu đao cong vút hình phượng vũ lượn mây
+    this.drawWuxiaRoofRidge(6, 70, true);
+    this.drawWuxiaRoofRidge(W - 22, 70, false);
 
-    // Hai Đèn Lồng Lục Giác Đỏ Treo 2 Bên (Đung đưa theo nhịp)
-    const sway = Math.sin(this.time * 1.5) * 4;
-    this.drawPixelLantern(58 + sway, 115);
-    this.drawPixelLantern(W - 86 - sway, 115);
+    // HAI CỘT GỖ LIM NGUYÊN KHỐI CHẠM RỒNG VÀNG
+    ctx.fillStyle = '#2c1208';
+    ctx.fillRect(16, 102, 32, 485);
+    ctx.fillRect(W - 48, 102, 32, 485);
 
-    // Nền gạch chiếu thiền Chánh điện (Lát gạch nung Bát Tràng)
-    ctx.fillStyle = '#2d182b';
-    ctx.fillRect(0, 410, W, H - 410);
+    // Khắc câu đối Thiếu Lâm chữ vàng thếp ngọc
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(20, 108, 24, 6);
+    ctx.fillRect(W - 44, 108, 24, 6);
+    this.drawWuxiaCouplet(24, 138, ['BỒ', 'ĐỀ', 'BẢN', 'VÔ', 'THỤ']);
+    this.drawWuxiaCouplet(W - 40, 138, ['MINH', 'KÍNH', 'DIỆC', 'PHI', 'ĐÀI']);
 
-    // Các đường chỉ gạch phối cảnh 16-bit
-    ctx.strokeStyle = '#3e2038';
+    // Rèm Gấm Lụa Vàng buông rủ 2 bên chánh điện
+    ctx.fillStyle = 'rgba(229, 179, 56, 0.22)';
+    ctx.fillRect(48, 102, 14, 250);
+    ctx.fillRect(W - 62, 102, 14, 250);
+
+    // HAI CHẬU BONSAI TÙNG BÁCH CỔ PHONG HAI BÊN BỆ ĐIỆN
+    this.drawBonsaiPine(64, 308);
+    this.drawBonsaiPine(W - 88, 308);
+
+    // NỀN ĐÁ BÁT TRÀNG PHỐI CẢNH ĐA TẦNG
+    ctx.fillStyle = '#1c0f1b';
+    ctx.fillRect(0, 412, W, H - 412);
+
+    // Các đường gân gạch cổ phong 16-bit
+    ctx.strokeStyle = '#2d182a';
     ctx.lineWidth = 2;
-    for (let y = 430; y < H; y += 38) {
+    for (let y = 435; y < H; y += 38) {
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(W, y);
       ctx.stroke();
     }
-    for (let x = 40; x < W; x += 65) {
+    for (let x = 35; x < W; x += 62) {
       ctx.beginPath();
       ctx.moveTo(x, 420);
-      ctx.lineTo(x * 1.3 - W * 0.15, H);
+      ctx.lineTo(x * 1.34 - W * 0.17, H);
       ctx.stroke();
     }
   }
 
-  drawPixelTileEdge(x, y, isLeft) {
+  drawWuxiaRoofRidge(x, y, isLeft) {
     const ctx = this.ctx;
-    ctx.fillStyle = '#f8b800';
+    ctx.fillStyle = '#fce881';
     const dir = isLeft ? -1 : 1;
     ctx.fillRect(x, y, 16, 6);
     ctx.fillRect(x + dir * 6, y - 8, 10, 8);
     ctx.fillRect(x + dir * 12, y - 16, 6, 8);
+    // Hạt châu đỉnh ngói
+    ctx.fillStyle = '#b82b1c';
+    ctx.fillRect(x + dir * 13, y - 22, 5, 5);
   }
 
-  drawCoupletLetters(x, startY, words) {
+  drawWuxiaCouplet(x, startY, words) {
     const ctx = this.ctx;
-    ctx.fillStyle = '#fce47c';
-    ctx.font = 'bold 13px "VT323", monospace';
+    ctx.font = 'bold 13px "VT323", "Noto Serif", serif';
     ctx.textAlign = 'center';
     words.forEach((w, i) => {
-      ctx.fillText(w, x + 6, startY + i * 26);
+      ctx.fillStyle = '#fce881';
+      ctx.shadowColor = '#000';
+      ctx.shadowBlur = 4;
+      ctx.fillText(w, x + 8, startY + i * 26);
+      ctx.shadowBlur = 0;
     });
   }
 
-  drawPixelLantern(x, y) {
+  drawBonsaiPine(x, y) {
     const ctx = this.ctx;
-    // Dây treo
-    ctx.fillStyle = '#d09828';
-    ctx.fillRect(x + 10, y, 2, 22);
+    // Chậu gốm men lam
+    ctx.fillStyle = '#203a48';
+    ctx.fillRect(x + 4, y + 26, 20, 12);
+    ctx.fillStyle = '#e5b338';
+    ctx.fillRect(x + 2, y + 24, 24, 3);
 
-    // Thân lồng đèn đỏ vàng
-    const lanternPulse = 0.8 + 0.2 * Math.sin(this.time * 4);
-    ctx.fillStyle = '#b81c20';
-    ctx.fillRect(x + 2, y + 22, 18, 26);
-    ctx.fillStyle = '#e8a820';
-    ctx.fillRect(x + 5, y + 25, 12, 20);
+    // Thân cây tùng gồ ghề
+    ctx.fillStyle = '#3e2010';
+    ctx.fillRect(x + 12, y + 10, 5, 16);
+    ctx.fillRect(x + 8, y + 14, 12, 4);
 
-    // Ánh sáng tỏa ra
-    ctx.fillStyle = `rgba(255, 230, 80, ${0.25 * lanternPulse})`;
-    ctx.fillRect(x - 8, y + 14, 38, 42);
-
-    // Tua rua lồng đèn
-    ctx.fillStyle = '#d09828';
-    ctx.fillRect(x + 9, y + 48, 4, 14);
+    // Tán lá kim xanh ngọc
+    ctx.fillStyle = '#1c6846';
+    ctx.fillRect(x - 2, y + 6, 14, 8);
+    ctx.fillRect(x + 10, y + 2, 16, 9);
+    ctx.fillRect(x + 4, y - 2, 16, 8);
   }
 
   // ==========================================================================
-  // 2. TƯỢNG ĐỨC PHẬT THÍCH CA MÂU NI & HÀO QUANG 16-BIT
+  // 2. ĐẠI KIM THÂN ĐỨC PHẬT & HÀO QUANG CỬU PHẨM (Hero's Adventure Gold Buddha)
   // ==========================================================================
-  drawPixelBuddhaStatue() {
+  drawWuxiaBuddhaStatue() {
     const ctx = this.ctx;
     const cx = this.virtualWidth * 0.5;
-    const cy = 205; // Tâm tượng Phật
+    const cy = 205;
 
-    // 1. Hào Quang Tỏa Sáng Tuần Hoàn (Palette Cycling 16-bit Halo)
-    const haloRadius = 68 + Math.sin(this.time * 2.2) * 5;
-    const haloSteps = 5;
-    for (let r = haloSteps; r >= 1; r--) {
-      const rad = (haloRadius / haloSteps) * r;
-      const alpha = 0.12 + (haloSteps - r) * 0.05;
-      ctx.fillStyle = `rgba(255, 220, 60, ${alpha})`;
+    // 1. Hào Quang Cửu Phẩm Kim Quang (9 Tầng Ánh Sáng Chân Khí)
+    const haloRadius = 72 + Math.sin(this.time * 2.5) * 6;
+    for (let r = 5; r >= 1; r--) {
+      const rad = (haloRadius / 5) * r;
+      const alpha = 0.08 + (5 - r) * 0.06;
+      ctx.fillStyle = `rgba(252, 232, 129, ${alpha})`;
       ctx.beginPath();
-      ctx.arc(cx, cy - 22, rad, 0, Math.PI * 2);
+      ctx.arc(cx, cy - 24, rad, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // Các tia hào quang 16-bit tỏa 8 hướng
-    const rayAngle = this.time * 0.45;
-    ctx.fillStyle = 'rgba(255, 240, 120, 0.35)';
+    // 8 Điểm Kim Quang Tinh Tú xoay quanh hào quang
+    const rot = this.time * 0.5;
+    ctx.fillStyle = '#fce881';
     for (let i = 0; i < 8; i++) {
-      const ang = rayAngle + (i * Math.PI / 4);
-      const rx = cx + Math.cos(ang) * (haloRadius + 14);
-      const ry = (cy - 22) + Math.sin(ang) * (haloRadius + 14);
-      ctx.fillRect(Math.round(rx) - 2, Math.round(ry) - 2, 5, 5);
+      const ang = rot + (i * Math.PI / 4);
+      const kx = cx + Math.cos(ang) * (haloRadius + 15);
+      const ky = (cy - 24) + Math.sin(ang) * (haloRadius + 15);
+      ctx.fillRect(Math.round(kx) - 2, Math.round(ky) - 2, 5, 5);
     }
 
-    // 2. Tòa Sen Vàng Bát Nhã (Đài sen tam cấp 16-bit)
-    ctx.fillStyle = '#b88018'; // Đáy tòa sen
-    ctx.fillRect(cx - 52, cy + 50, 104, 18);
-    ctx.fillStyle = '#f8b800'; // Thân tòa sen
-    ctx.fillRect(cx - 44, cy + 38, 88, 14);
+    // 2. Cửu Phẩm Liên Hoa Đài (Tòa Sen Cổ Phong Uy Nghiêm)
+    ctx.fillStyle = '#7a4f08'; // Đáy bệ sen bát giác
+    ctx.fillRect(cx - 56, cy + 50, 112, 20);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(cx - 48, cy + 38, 96, 14);
 
-    // Cánh hoa sen hồng vàng uốn lượn xung quanh đài sen
-    ctx.fillStyle = '#f878a8';
+    // Cánh hoa sen hồng ngọc dát vàng
     for (let k = -4; k <= 4; k++) {
-      ctx.fillRect(cx + k * 11 - 5, cy + 28, 10, 12);
+      ctx.fillStyle = '#b82b1c';
+      ctx.fillRect(cx + k * 12 - 6, cy + 28, 12, 14);
+      ctx.fillStyle = '#fce881';
+      ctx.fillRect(cx + k * 12 - 4, cy + 29, 8, 4);
     }
 
-    // 3. Thân Tượng Đức Phật Thích Ca (Dát vàng rực rỡ)
-    // Áo Cà sa vàng óng
-    ctx.fillStyle = '#e8a010';
-    ctx.fillRect(cx - 32, cy - 2, 64, 40); // Khối thân ngực
-    ctx.fillStyle = '#fcd040'; // Vạt y áo cà sa vắt chéo
-    ctx.fillRect(cx - 16, cy + 2, 32, 36);
+    // 3. Đại Kim Thân Đức Phật Thích Ca (Phong cách tượng vàng đồ sộ)
+    // Thân y áo cà sa vàng óng
+    ctx.fillStyle = '#d49818';
+    ctx.fillRect(cx - 35, cy - 4, 70, 42);
+    ctx.fillStyle = '#fce881'; // Vạt áo vắt chéo thêu viền
+    ctx.fillRect(cx - 18, cy, 36, 38);
 
-    // Hai cánh tay kiết ấn thiền định (Dhyana Mudra)
-    ctx.fillStyle = '#e8a010';
-    ctx.fillRect(cx - 40, cy + 8, 14, 26);
-    ctx.fillRect(cx + 26, cy + 8, 14, 26);
-    ctx.fillStyle = '#ffe070'; // Hai bàn tay đan nhau đặt trên đùi
-    ctx.fillRect(cx - 14, cy + 24, 28, 10);
+    // Hai cánh tay kiết ấn thiền định (Thiền Định Ấn)
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(cx - 44, cy + 8, 16, 28);
+    ctx.fillRect(cx + 28, cy + 8, 16, 28);
+    ctx.fillStyle = '#fce881'; // Bàn tay kết ấn
+    ctx.fillRect(cx - 16, cy + 24, 32, 12);
 
-    // 4. Khuôn Mặt & Nhục Kế (Ushnisha) Đức Phật
-    // Khuôn mặt từ bi
-    ctx.fillStyle = '#ffe070';
-    ctx.fillRect(cx - 18, cy - 32, 36, 30);
-    // Vành tai dài phúc hậu
-    ctx.fillRect(cx - 22, cy - 26, 4, 20);
-    ctx.fillRect(cx + 18, cy - 26, 4, 20);
+    // 4. Kim Dung & Nhục Kế Ushnisha
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(cx - 20, cy - 34, 40, 32);
+    // Vành tai dài Phật tướng
+    ctx.fillRect(cx - 24, cy - 28, 4, 22);
+    ctx.fillRect(cx + 20, cy - 28, 4, 22);
 
-    // Mắt khép hờ tĩnh tọa
-    ctx.fillStyle = '#5c3814';
-    ctx.fillRect(cx - 12, cy - 18, 8, 2);
-    ctx.fillRect(cx + 4, cy - 18, 8, 2);
-    // Nốt ruồi ngọc Bạch Hào (Urna) giữa trán
-    ctx.fillStyle = '#f83838';
-    ctx.fillRect(cx - 1, cy - 24, 3, 3);
+    // Mắt khép hờ từ bi
+    ctx.fillStyle = '#4a2608';
+    ctx.fillRect(cx - 14, cy - 20, 9, 2);
+    ctx.fillRect(cx + 5, cy - 20, 9, 2);
+    // Bạch Hào châu ngọc giữa trán
+    ctx.fillStyle = '#b82b1c';
+    ctx.fillRect(cx - 1, cy - 26, 3, 3);
 
-    // Tóc xoắn ốc xanh đen & Nhục kế nhô cao trên đỉnh đầu
-    ctx.fillStyle = '#1c2844';
-    ctx.fillRect(cx - 18, cy - 38, 36, 8);
-    ctx.fillRect(cx - 8, cy - 44, 16, 7); // Nhục kế nhô cao
+    // Tóc xoắn ốc xanh biếc & Nhục kế trên đỉnh đầu
+    ctx.fillStyle = '#18243b';
+    ctx.fillRect(cx - 20, cy - 40, 40, 8);
+    ctx.fillRect(cx - 9, cy - 47, 18, 8);
   }
 
   // ==========================================================================
-  // 3. BÀN THỜ TAM BẢO & LƯ HƯƠNG NGHI NGÚT KHÓI PIXEL 16-BIT
+  // 3. BÀN THỜ TAM BẢO, LƯ ĐỒNG BÁT QUÁI & KHÓI TRẦM LONG QUY
   // ==========================================================================
-  drawPixelAltarAndIncense() {
+  drawWuxiaAltarAndIncense() {
     const ctx = this.ctx;
     const cx = this.virtualWidth * 0.5;
     const ay = 285;
 
-    // Bàn thờ sơn son thếp vàng
-    ctx.fillStyle = '#5c1b12';
-    ctx.fillRect(cx - 72, ay, 144, 46);
-    ctx.fillStyle = '#f8b800'; // Nẹp viền vàng
-    ctx.fillRect(cx - 76, ay - 2, 152, 6);
-    ctx.fillRect(cx - 68, ay + 38, 136, 5);
+    // Bàn thờ gỗ trắc đỏ sơn son nẹp đồng
+    ctx.fillStyle = '#4a150e';
+    ctx.fillRect(cx - 78, ay, 156, 48);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(cx - 82, ay - 2, 164, 6);
+    ctx.fillRect(cx - 72, ay + 40, 144, 5);
 
-    // Mâm ngũ quả & đĩa hoa sen cúng Phật
+    // Hoa văn Bát Quái vàng giữa bàn thờ
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(cx - 8, ay + 14, 16, 16);
+    ctx.fillStyle = '#4a150e';
+    ctx.fillRect(cx - 5, ay + 17, 10, 10);
+
+    // Đĩa hoa sen cúng Phật & Chén trà ngọc
     ctx.fillStyle = '#f878a8';
-    ctx.fillRect(cx - 56, ay - 10, 16, 8); // Đĩa hoa sen hồng bên trái
-    ctx.fillStyle = '#f8a020';
-    ctx.fillRect(cx + 40, ay - 10, 16, 8); // Mâm ngũ quả vàng bên phải
+    ctx.fillRect(cx - 62, ay - 11, 18, 9);
+    ctx.fillStyle = '#2ea879'; // Chén ngọc lưu ly
+    ctx.fillRect(cx + 44, ay - 10, 18, 8);
 
-    // Lư hương đồng tam khí uy nghiêm chính giữa bàn thờ
-    ctx.fillStyle = '#b88424';
-    ctx.fillRect(cx - 20, ay - 16, 40, 22);
-    ctx.fillStyle = '#fcd040';
-    ctx.fillRect(cx - 24, ay - 18, 48, 5); // Miệng lư hương
-    // Chân quỳ lư hương
-    ctx.fillStyle = '#8a5c12';
-    ctx.fillRect(cx - 16, ay + 6, 8, 6);
-    ctx.fillRect(cx + 8, ay + 6, 8, 6);
+    // LƯ ĐỒNG BÁT QUÁI TAM TÚC UY NGHIÊM
+    ctx.fillStyle = '#8a5c18';
+    ctx.fillRect(cx - 22, ay - 18, 44, 24);
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(cx - 26, ay - 20, 52, 5); // Miệng lư
+    // 3 chân quỳ lư hương
+    ctx.fillStyle = '#5c3a08';
+    ctx.fillRect(cx - 18, ay + 6, 8, 8);
+    ctx.fillRect(cx + 10, ay + 6, 8, 8);
 
-    // Ba nén nhang đỏ cắm trên lư hương
-    ctx.fillStyle = '#c82828';
-    ctx.fillRect(cx - 7, ay - 36, 2, 20); // Nén trái
-    ctx.fillRect(cx - 1, ay - 42, 2, 26); // Nén giữa
-    ctx.fillRect(cx + 5, ay - 36, 2, 20); // Nén phải
+    // BA NÉN CHÂN HƯƠNG ĐỎ THẪM
+    ctx.fillStyle = '#b82b1c';
+    ctx.fillRect(cx - 8, ay - 38, 2, 20);
+    ctx.fillRect(cx - 1, ay - 44, 2, 26);
+    ctx.fillRect(cx + 6, ay - 38, 2, 20);
 
-    // Đầu nhang đỏ rực nhấp nháy
-    const glow = (Math.sin(this.time * 8) + 1) * 0.5;
-    ctx.fillStyle = glow > 0.4 ? '#ff5030' : '#ffe050';
-    ctx.fillRect(cx - 8, ay - 38, 4, 3);
-    ctx.fillRect(cx - 2, ay - 44, 4, 3);
-    ctx.fillRect(cx + 4, ay - 38, 4, 3);
+    // Đầu nhang rực lửa Chân khí
+    const firePulse = (Math.sin(this.time * 8) + 1) * 0.5;
+    ctx.fillStyle = firePulse > 0.4 ? '#ff7675' : '#fce881';
+    ctx.fillRect(cx - 9, ay - 40, 4, 3);
+    ctx.fillRect(cx - 2, ay - 46, 4, 3);
+    ctx.fillRect(cx + 5, ay - 40, 4, 3);
 
-    // Khói trầm hương uốn lượn bay lên trời (Procedural Pixel Smoke)
-    ctx.fillStyle = 'rgba(255, 245, 220, 0.42)';
-    for (let s = 0; s < 18; s++) {
-      const sy = ay - 48 - (s * 8);
-      const wave = Math.sin(this.time * 2.5 + s * 0.45) * (6 + s * 1.2);
-      const smokeW = 4 + Math.floor(s * 0.7);
+    // LÀN KHÓI TRẦM LONG QUY CUỘN SÓNG (Wuxia Dragon Smoke)
+    ctx.fillStyle = 'rgba(252, 240, 215, 0.45)';
+    for (let s = 0; s < 20; s++) {
+      const sy = ay - 50 - (s * 8);
+      const wave = Math.sin(this.time * 2.8 + s * 0.42) * (7 + s * 1.3);
+      const smokeW = 4 + Math.floor(s * 0.75);
       ctx.fillRect(Math.round(cx + wave - smokeW * 0.5), Math.round(sy), smokeW, 5);
     }
   }
 
   // ==========================================================================
-  // 4. HÀNG 3 VỊ SƯ THẦY TỌA THIỀN & GÕ MÕ
+  // 4. HÀNG 3 VỊ THIẾU LÂM CAO TĂNG (Phương Trượng Đại Sư gõ Mõ Long Ngư)
   // ==========================================================================
-  drawHeadMonks() {
+  drawWuxiaHeadMonks() {
     const ctx = this.ctx;
     const W = this.virtualWidth;
     const monkY = 370;
 
-    // Sư Trụ Trì ở giữa (y = monkY, cx = W * 0.5)
-    this.drawHeadMonkSprite(W * 0.5, monkY, 'tru_tri', 'Sư Trụ Trì', true);
+    // Phương Trượng Đại Sư ở giữa
+    this.drawShaolinAbbotSprite(W * 0.5, monkY, 'Phương Trượng Đại Sư');
 
-    // Thầy Minh Đạo bên trái
-    this.drawHeadMonkSprite(W * 0.24, monkY, 'thay_minh_dao', 'Thầy Minh Đạo', false);
+    // Thầy Minh Đạo bên trái (Chấp Chưởng Giới Luật)
+    this.drawShaolinMonkSprite(W * 0.23, monkY, 'Thầy Minh Đạo');
 
-    // Thầy Tâm Từ bên phải
-    this.drawHeadMonkSprite(W * 0.76, monkY, 'thay_tam_tu', 'Thầy Tâm Từ', false);
+    // Thầy Tâm Từ bên phải (Chấp Chưởng Tạng Kinh)
+    this.drawShaolinMonkSprite(W * 0.77, monkY, 'Thầy Tâm Từ');
   }
 
-  drawHeadMonkSprite(x, y, type, label, isAbbot = false) {
+  drawShaolinAbbotSprite(x, y, label) {
     const ctx = this.ctx;
-    const breath = Math.sin(this.time * 2 + (isAbbot ? 0 : 1.2)) * 1.5;
+    const breath = Math.sin(this.time * 2.2) * 1.6;
     const drawY = Math.round(y + breath);
 
-    // 1. Bồ đoàn thiền tọa
-    ctx.fillStyle = '#6a3820';
-    ctx.fillRect(x - 24, drawY + 24, 48, 12);
-    ctx.fillStyle = '#c89030';
-    ctx.fillRect(x - 20, drawY + 22, 40, 4);
+    // Bồ đoàn gấm đỏ thêu hoa sen vàng
+    ctx.fillStyle = '#4a150e';
+    ctx.fillRect(x - 26, drawY + 24, 52, 13);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(x - 22, drawY + 22, 44, 4);
 
-    // 2. Y Cà sa Sư Thầy
-    const robeColor = isAbbot ? '#c03828' : '#d88c20'; // Trụ trì cà sa đỏ tổ, 2 thầy cà sa vàng
-    const innerColor = isAbbot ? '#ecc94b' : '#975a16';
+    // Cà sa Đại Tổ thêu kim tuyến (Đỏ son + Vàng rực)
+    ctx.fillStyle = '#b82b1c';
+    ctx.fillRect(x - 20, drawY - 6, 40, 30);
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(x - 9, drawY, 18, 24);
 
-    ctx.fillStyle = robeColor;
-    ctx.fillRect(x - 18, drawY - 4, 36, 28);
-    ctx.fillStyle = innerColor;
-    ctx.fillRect(x - 8, drawY + 2, 16, 22);
+    // Chuỗi tràng hạt Bồ Đề 108 hạt vắt qua ngực
+    ctx.fillStyle = '#5c3a08';
+    ctx.fillRect(x - 12, drawY - 2, 24, 4);
 
-    // 3. Đầu Sư Thầy cạo trọc trang nghiêm
-    ctx.fillStyle = '#ffe090';
-    ctx.fillRect(x - 11, drawY - 26, 22, 22);
-    // Vành tai dài
-    ctx.fillRect(x - 13, drawY - 20, 2, 12);
-    ctx.fillRect(x + 11, drawY - 20, 2, 12);
+    // Đầu Phương Trượng cạo trọc uy nghiêm, râu dài bạc phơ
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(x - 12, drawY - 28, 24, 23);
+    // Vành tai phúc hậu
+    ctx.fillRect(x - 14, drawY - 22, 2, 13);
+    ctx.fillRect(x + 12, drawY - 22, 2, 13);
+    // Chòm râu bạc dài uy đức
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x - 4, drawY - 9, 8, 12);
+    ctx.fillRect(x - 2, drawY + 3, 4, 6);
 
     // Mắt khép thiền
-    ctx.fillStyle = '#5c3814';
+    ctx.fillStyle = '#4a2608';
+    ctx.fillRect(x - 8, drawY - 16, 5, 2);
+    ctx.fillRect(x + 3, drawY - 16, 5, 2);
+
+    // ĐẠI MỘC NGƯ (Mõ Gỗ Long Ngư chạm cá hóa rồng)
+    ctx.fillStyle = '#5c2208';
+    ctx.fillRect(x - 12, drawY + 12, 24, 15);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(x - 9, drawY + 14, 18, 9);
+
+    // Dùi mõ gõ theo nhịp
+    const strike = this.woodenFishPulse > 0.1 ? 6 : 0;
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(x + 14, drawY + 6 + strike, 6, 6);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(x + 7, drawY + 10 + strike, 9, 3);
+
+    // Nốt nhạc Chân Khí bay lên khi gõ mõ
+    if (this.woodenFishPulse > 0.2) {
+      ctx.fillStyle = '#fce881';
+      ctx.font = '16px "VT323", monospace';
+      ctx.fillText('♫', x - 16, drawY - 6 - this.woodenFishPulse * 18);
+    }
+
+    // Thẻ Tên Gỗ Trắc Cổ Phong
+    this.drawWuxiaMonkLabel(x, drawY + 37, label);
+  }
+
+  drawShaolinMonkSprite(x, y, label) {
+    const ctx = this.ctx;
+    const breath = Math.sin(this.time * 2.2 + 1.2) * 1.5;
+    const drawY = Math.round(y + breath);
+
+    // Bồ đoàn
+    ctx.fillStyle = '#4a150e';
+    ctx.fillRect(x - 22, drawY + 24, 44, 12);
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(x - 18, drawY + 22, 36, 4);
+
+    // Cà sa vàng đất nung
+    ctx.fillStyle = '#c58c1b';
+    ctx.fillRect(x - 18, drawY - 4, 36, 28);
+    ctx.fillStyle = '#7a4f08';
+    ctx.fillRect(x - 8, drawY + 2, 16, 22);
+
+    // Hai tay chắp chữ thập niệm kinh
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(x - 5, drawY + 4, 10, 10);
+
+    // Đầu Sư Thầy
+    ctx.fillStyle = '#fce881';
+    ctx.fillRect(x - 11, drawY - 26, 22, 22);
+    ctx.fillStyle = '#4a2608';
     ctx.fillRect(x - 7, drawY - 14, 5, 2);
     ctx.fillRect(x + 2, drawY - 14, 5, 2);
 
-    // 4. Nếu là Sư Trụ Trì: Đặt Mõ Gỗ trước mặt và hoạt ảnh dùi gõ mõ
-    if (isAbbot) {
-      // Chiếc mõ gỗ tròn
-      ctx.fillStyle = '#663318';
-      ctx.fillRect(x - 10, drawY + 12, 20, 14);
-      ctx.fillStyle = '#9e5524';
-      ctx.fillRect(x - 8, drawY + 14, 16, 8);
+    this.drawWuxiaMonkLabel(x, drawY + 37, label);
+  }
 
-      // Cánh tay cầm dùi mõ gõ theo nhịp
-      const strike = this.woodenFishPulse > 0.1 ? 5 : 0;
-      ctx.fillStyle = '#ffe090';
-      ctx.fillRect(x + 12, drawY + 6 + strike, 6, 6); // Bàn tay
-      ctx.fillStyle = '#c89030';
-      ctx.fillRect(x + 6, drawY + 10 + strike, 8, 3); // Dùi gõ
+  drawWuxiaMonkLabel(x, y, text) {
+    const ctx = this.ctx;
+    ctx.fillStyle = 'rgba(28, 12, 30, 0.92)';
+    ctx.fillRect(x - 44, y, 88, 17);
+    ctx.strokeStyle = '#c58c1b';
+    ctx.strokeRect(x - 44, y, 88, 17);
 
-      // Nốt nhạc bay lên khi gõ mõ
-      if (this.woodenFishPulse > 0.2) {
-        ctx.fillStyle = '#ffe640';
-        ctx.font = '16px "VT323", monospace';
-        ctx.fillText('♫', x - 14, drawY - 4 - this.woodenFishPulse * 16);
-      }
-    } else {
-      // 2 vị Thầy 2 bên chắp tay búp sen niệm Phật
-      ctx.fillStyle = '#ffe090';
-      ctx.fillRect(x - 5, drawY + 4, 10, 10);
-    }
-
-    // 5. Thẻ Tên Vị Thầy bằng font pixel
-    ctx.fillStyle = 'rgba(28, 14, 40, 0.88)';
-    ctx.fillRect(x - 38, drawY + 36, 76, 17);
-    ctx.strokeStyle = '#f8b800';
-    ctx.strokeRect(x - 38, drawY + 36, 76, 17);
-
-    ctx.fillStyle = '#ffe640';
-    ctx.font = '12px "VT323", monospace';
+    ctx.fillStyle = '#fce881';
+    ctx.font = '12px "VT323", "Noto Serif", serif';
     ctx.textAlign = 'center';
-    ctx.fillText(label, x, drawY + 49);
+    ctx.fillText(text, x, y + 13);
   }
 
   // ==========================================================================
-  // 5. VẼ LƯỚI BỒ ĐOÀN & 19 SKIN THIỀN SINH PIXEL ART 16-BIT
+  // 5. CHIBI WUXIA SPRITES ĐẢ TỌA & TRẬN PHÁP BÁT QUÁI (Hero's Adventure Style)
   // ==========================================================================
-  drawSeatsAndMeditators() {
-    const ctx = this.ctx;
+  drawSeatsAndWuxiaMeditators() {
     const total = this.totalSeats || 24;
 
     for (let i = 0; i < total; i++) {
@@ -547,44 +619,57 @@ class PixelSceneRenderer {
       const seat = this.seats[i];
       const isOccupied = seat && seat.occupied && seat.user;
       
-      // Nếu đang trong hoạt ảnh cắm nhang thì bỏ qua vẽ tĩnh tại chỗ
       if (this.incenseOfferings.has(i)) continue;
 
-      this.drawSingleSeat(pos.x, pos.y, pos.scale, seat, isOccupied, i);
+      this.drawSingleWuxiaSeat(pos.x, pos.y, pos.scale, seat, isOccupied, i);
     }
   }
 
-  drawSingleSeat(x, y, scale, seat, isOccupied, seatIndex) {
+  drawSingleWuxiaSeat(x, y, scale, seat, isOccupied, seatIndex) {
     const ctx = this.ctx;
     ctx.save();
     ctx.translate(x, y);
     ctx.scale(scale, scale);
 
-    // 1. Vẽ Bồ Đoàn Tròn Pixel Art
-    ctx.fillStyle = isOccupied ? '#542618' : '#301826';
-    ctx.fillRect(-22, -6, 44, 14);
-    ctx.fillStyle = isOccupied ? '#b87820' : '#4a253a';
-    ctx.fillRect(-18, -8, 36, 4);
+    // 1. Bồ Đoàn Thiền Tọa Cổ Phong
+    ctx.fillStyle = isOccupied ? '#5c2208' : '#2a121f';
+    ctx.fillRect(-23, -6, 46, 14);
+    ctx.fillStyle = isOccupied ? '#c58c1b' : '#3e1a2f';
+    ctx.fillRect(-19, -8, 38, 4);
 
-    // 2. Vòng hào quang phước lành nếu Phật tử đã cúng dường tích điểm công đức
+    // 2. Trận Pháp Bát Quái / Chân Khí Hoa Sen (Khi đã cúng dường có điểm công đức)
     if (isOccupied && seat.user.meritPoints > 0) {
-      const auraPulse = Math.sin(this.time * 3 + seatIndex) * 3;
-      ctx.strokeStyle = '#ffe640';
+      const rot = this.time * 2 + seatIndex;
+      ctx.strokeStyle = '#fce881';
       ctx.lineWidth = 2;
-      ctx.strokeRect(-26 - auraPulse * 0.5, -34, 52 + auraPulse, 44);
+      ctx.strokeRect(-28, -34, 56, 44);
+
+      // 4 Tia Chân Khí ngọc bích 4 góc
+      ctx.fillStyle = '#64e3b1';
+      ctx.fillRect(-30, -36, 4, 4);
+      ctx.fillRect(26, -36, 4, 4);
+      ctx.fillRect(-30, 8, 4, 4);
+      ctx.fillRect(26, 8, 4, 4);
     }
 
-    // 3. Nếu có người ngồi thiền: Vẽ Sprite Nhân vật Pixel
+    // 3. Nhân vật Chibi Kiếm Hiệp Đả Tọa (Chibi Wuxia Sprite)
     if (isOccupied) {
       const user = seat.user;
-      const breath = Math.sin(this.time * 2.2 + seatIndex * 0.6) * 1.5;
-      this.drawCharacterSprite(0, Math.round(-12 + breath), user.skin || 'nam');
+      const breath = Math.sin(this.time * 2.4 + seatIndex * 0.7) * 1.5;
+      this.drawChibiWuxiaSprite(0, Math.round(-12 + breath), user.skin || 'nam');
 
-      // Nhãn Tên Phật Tử
-      this.drawUserLabel(0, 14, user.nickname || 'Phật Tử', user.meritPoints);
+      // Luồng Chân Khí Tam Hoa Tụ Đỉnh (Qi breath from head)
+      if (seat.user.meritPoints > 0) {
+        ctx.fillStyle = 'rgba(252, 232, 129, 0.45)';
+        const qiY = -34 + Math.sin(this.time * 4 + seatIndex) * 3;
+        ctx.fillRect(-2, qiY, 4, 4);
+      }
+
+      // Thẻ Tên Hiệp Khách Cổ Phong
+      this.drawWuxiaUserLabel(0, 15, user.nickname || 'Hiệp Khách', user.meritPoints);
     } else {
-      // Ghế Trống: Vẽ số thứ tự ghế mờ
-      ctx.fillStyle = '#6e4460';
+      // Ghế trống
+      ctx.fillStyle = '#633955';
       ctx.font = '12px "VT323", monospace';
       ctx.textAlign = 'center';
       ctx.fillText(`${seatIndex + 1}`, 0, 4);
@@ -594,162 +679,154 @@ class PixelSceneRenderer {
   }
 
   // ==========================================================================
-  // HỆ THỐNG VẼ 19 SKIN NHÂN VẬT SPRITES 16-BIT (Procedural Pixel Generators)
+  // BỘ TẠO SPRITE CHIBI WUXIA 16-BIT (HERO'S ADVENTURE CHARACTER ENGINE)
   // ==========================================================================
-  drawCharacterSprite(cx, cy, skin) {
+  drawChibiWuxiaSprite(cx, cy, skin) {
     const ctx = this.ctx;
-    const p = this.getSkinPalette(skin);
+    const p = this.getWuxiaPalette(skin);
 
-    // Thân áo ngồi thiền kiết già
+    // 1. Thân Áo Bào Kiếm Hiệp Ngồi Xếp Bằng Đả Tọa (Giao Lĩnh Áo Chéo)
     ctx.fillStyle = p.robe;
-    ctx.fillRect(cx - 15, cy - 2, 30, 20); // Vạt áo tràng
+    ctx.fillRect(cx - 16, cy - 2, 32, 20); // Vạt áo bào
     ctx.fillStyle = p.inner;
-    ctx.fillRect(cx - 6, cy + 2, 12, 16); // Vạt trong
+    ctx.fillRect(cx - 6, cy + 2, 12, 16); // Vạt trong cổ chéo
+    // Đai lưng hiệp khách (Waist Sash)
+    ctx.fillStyle = p.sash || '#c58c1b';
+    ctx.fillRect(cx - 15, cy + 5, 30, 4);
 
-    // Hai bàn tay chắp trước ngực hoặc đặt trên đùi
+    // Hai bàn tay kiết ấn đặt lên gối đả tọa
     ctx.fillStyle = p.skinTone;
-    ctx.fillRect(cx - 4, cy + 4, 8, 7);
+    ctx.fillRect(cx - 14, cy + 7, 6, 6);
+    ctx.fillRect(cx + 8, cy + 7, 6, 6);
 
-    // Khuôn mặt chibi retro 16-bit
+    // 2. Khuôn Mặt Chibi Kiếm Hiệp 16-bit
     ctx.fillStyle = p.skinTone;
-    ctx.fillRect(cx - 9, cy - 20, 18, 18);
+    ctx.fillRect(cx - 10, cy - 20, 20, 18);
 
-    // Mắt to chibi nhắm mắt thiền định
-    ctx.fillStyle = p.eyeColor || '#2c1808';
-    ctx.fillRect(cx - 6, cy - 11, 4, 2);
-    ctx.fillRect(cx + 2, cy - 11, 4, 2);
+    // Mắt to Chibi nhắm mắt tĩnh tâm
+    ctx.fillStyle = '#2c1404';
+    ctx.fillRect(cx - 7, cy - 11, 4, 2);
+    ctx.fillRect(cx + 3, cy - 11, 4, 2);
 
-    // Vẽ Tóc / Mũ / Phụ kiện đặc trưng theo từng Skin
-    this.drawSkinAccessory(cx, cy, skin, p);
+    // 3. Tóc Búi / Mũ Nón / Phụ Kiện Theo Môn Phái Wuxia
+    this.drawWuxiaAccessory(cx, cy, skin, p);
   }
 
-  getSkinPalette(skin) {
+  getWuxiaPalette(skin) {
     const palettes = {
-      nam: { robe: '#6a7888', inner: '#e2e8f0', skinTone: '#ffd9a0' },
-      nu: { robe: '#edf2f7', inner: '#cbd5e0', skinTone: '#ffe4c4' },
-      su: { robe: '#d69e2e', inner: '#975a16', skinTone: '#ffd9a0' },
-      tieu: { robe: '#b7791f', inner: '#ecc94b', skinTone: '#ffd9a0' },
-      ni: { robe: '#c09b52', inner: '#e2e8f0', skinTone: '#ffe4c4' },
-      caotang: { robe: '#c53030', inner: '#ecc94b', skinTone: '#ffd9a0' },
-      sen: { robe: '#f687b3', inner: '#fff5f7', skinTone: '#ffe4c4' },
-      vang: { robe: '#ecc94b', inner: '#ffffff', skinTone: '#ffd9a0' },
-      canhsat: { robe: '#2f5e3d', inner: '#eab308', skinTone: '#ffd9a0' },
-      bacsi: { robe: '#f8fafc', inner: '#ef4444', skinTone: '#ffd9a0' },
-      trom: { robe: '#1e293b', inner: '#f1f5f9', skinTone: '#ffd9a0' },
-      heo: { robe: '#f472b6', inner: '#fbcfe8', skinTone: '#fbcfe8' },
-      bo: { robe: '#f8fafc', inner: '#1e293b', skinTone: '#ffd9a0' },
-      ga: { robe: '#facc15', inner: '#ef4444', skinTone: '#ffd9a0' },
-      hocsinh: { robe: '#ffffff', inner: '#dc2626', skinTone: '#ffd9a0' },
-      duccha: { robe: '#0f172a', inner: '#ffffff', skinTone: '#ffd9a0' },
-      thantai: { robe: '#dc2626', inner: '#facc15', skinTone: '#ffd9a0' },
-      ninja: { robe: '#1e1b4b', inner: '#4338ca', skinTone: '#ffd9a0' },
-      congchua: { robe: '#fbcfe8', inner: '#f472b6', skinTone: '#ffe4c4' }
+      nam: { robe: '#4a5b6d', inner: '#d1d8e0', sash: '#c58c1b', skinTone: '#ffd9a0' },
+      nu: { robe: '#dff9fb', inner: '#c7ecee', sash: '#f878a8', skinTone: '#ffe4c4' },
+      su: { robe: '#d69e2e', inner: '#7a4f08', sash: '#b82b1c', skinTone: '#ffd9a0' },
+      tieu: { robe: '#b7791f', inner: '#fce881', sash: '#7a4f08', skinTone: '#ffd9a0' },
+      ni: { robe: '#c09b52', inner: '#e2e8f0', sash: '#7a4f08', skinTone: '#ffe4c4' },
+      caotang: { robe: '#b82b1c', inner: '#fce881', sash: '#fce881', skinTone: '#ffd9a0' },
+      sen: { robe: '#f687b3', inner: '#fff5f7', sash: '#fce881', skinTone: '#ffe4c4' },
+      vang: { robe: '#e5b338', inner: '#ffffff', sash: '#b82b1c', skinTone: '#ffd9a0' },
+      canhsat: { robe: '#1f3d28', inner: '#fce881', sash: '#b82b1c', skinTone: '#ffd9a0' }, // Cẩm Y Vệ
+      bacsi: { robe: '#f8fafc', inner: '#b82b1c', sash: '#2ea879', skinTone: '#ffd9a0' },   // Thần Y
+      trom: { robe: '#1a1824', inner: '#4a445a', sash: '#b82b1c', skinTone: '#ffd9a0' },    // Dạ Hành Đạo Tặc
+      heo: { robe: '#f472b6', inner: '#fbcfe8', sash: '#fce881', skinTone: '#fbcfe8' },
+      bo: { robe: '#f8fafc', inner: '#1e293b', sash: '#c58c1b', skinTone: '#ffd9a0' },
+      ga: { robe: '#facc15', inner: '#ef4444', sash: '#b82b1c', skinTone: '#ffd9a0' },
+      hocsinh: { robe: '#f5f6fa', inner: '#b82b1c', sash: '#273c75', skinTone: '#ffd9a0' }, // Thư Sinh Tầm Đạo
+      duccha: { robe: '#0f172a', inner: '#ffffff', sash: '#c58c1b', skinTone: '#ffd9a0' },   // Tây Vực Giáo Sĩ
+      thantai: { robe: '#b82b1c', inner: '#fce881', sash: '#fce881', skinTone: '#ffd9a0' },  // Tài Thần Gia
+      ninja: { robe: '#181232', inner: '#3c2e74', sash: '#b82b1c', skinTone: '#ffd9a0' },    // Nhẫn Giả Đông Doanh
+      congchua: { robe: '#fbcfe8', inner: '#f472b6', sash: '#fce881', skinTone: '#ffe4c4' } // Quận Chúa
     };
     return palettes[skin] || palettes.nam;
   }
 
-  drawSkinAccessory(cx, cy, skin, p) {
+  drawWuxiaAccessory(cx, cy, skin, p) {
     const ctx = this.ctx;
 
     switch (skin) {
-      case 'canhsat': // Mũ cành hương cảnh sát xanh lá
-        ctx.fillStyle = '#1e3e28';
-        ctx.fillRect(cx - 10, cy - 25, 20, 6);
-        ctx.fillStyle = '#eab308';
-        ctx.fillRect(cx - 2, cy - 23, 4, 3);
+      case 'nam': // Búi tóc kiếm khách + Trâm cài
+        ctx.fillStyle = '#1c1208';
+        ctx.fillRect(cx - 10, cy - 22, 20, 5);
+        ctx.fillRect(cx - 4, cy - 28, 8, 7); // Búi tóc cao
+        ctx.fillStyle = '#c58c1b'; // Trâm cài ngọc
+        ctx.fillRect(cx - 7, cy - 25, 14, 2);
         break;
-      case 'bacsi': // Mũ y tế có chữ thập đỏ
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(cx - 9, cy - 25, 18, 6);
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect(cx - 1, cy - 24, 2, 4);
-        ctx.fillRect(cx - 2, cy - 23, 4, 2);
+      case 'nu': // Tóc dài cài trâm hoa sen ngọc
+        ctx.fillStyle = '#1c1208';
+        ctx.fillRect(cx - 10, cy - 22, 20, 5);
+        ctx.fillRect(cx - 12, cy - 14, 3, 14); // Lọn tóc thả hai bên
+        ctx.fillRect(cx + 9, cy - 14, 3, 14);
+        ctx.fillStyle = '#2ea879'; // Trâm phỉ thúy
+        ctx.fillRect(cx + 4, cy - 25, 4, 4);
         break;
-      case 'trom': // Khăn trùm đầu ninja đạo chích
-        ctx.fillStyle = '#0f172a';
+      case 'canhsat': // Mũ Cẩm Y Vệ (Phi Ngư Mạo)
+        ctx.fillStyle = '#1a1418';
+        ctx.fillRect(cx - 11, cy - 27, 22, 9);
+        ctx.fillStyle = '#fce881';
+        ctx.fillRect(cx - 3, cy - 25, 6, 4);
+        break;
+      case 'bacsi': // Thần Y: Khăn quấn trán & Bầu hồ lô thuốc
+        ctx.fillStyle = '#2ea879';
+        ctx.fillRect(cx - 10, cy - 23, 20, 4);
+        // Hồ lô bên hông
+        ctx.fillStyle = '#e5b338';
+        ctx.fillRect(cx + 12, cy + 3, 5, 7);
+        break;
+      case 'trom': // Khăn trùm mặt Dạ Hành
+        ctx.fillStyle = '#0d0914';
         ctx.fillRect(cx - 10, cy - 24, 20, 7);
-        ctx.fillRect(cx - 9, cy - 7, 18, 5); // Khẩu trang che miệng
+        ctx.fillRect(cx - 10, cy - 7, 20, 6);
         break;
-      case 'heo': // Tai heo hồng
-        ctx.fillStyle = '#f472b6';
-        ctx.fillRect(cx - 11, cy - 24, 5, 5);
-        ctx.fillRect(cx + 6, cy - 24, 5, 5);
-        // Mũi heo
-        ctx.fillStyle = '#f43f5e';
-        ctx.fillRect(cx - 4, cy - 10, 8, 4);
+      case 'thantai': // Mũ cánh chuồn Tài Thần mạ vàng
+        ctx.fillStyle = '#b82b1c';
+        ctx.fillRect(cx - 11, cy - 27, 22, 8);
+        ctx.fillStyle = '#fce881';
+        ctx.fillRect(cx - 18, cy - 23, 7, 3);
+        ctx.fillRect(cx + 11, cy - 23, 7, 3);
         break;
-      case 'bo': // Sừng bò sữa
-        ctx.fillStyle = '#475569';
-        ctx.fillRect(cx - 12, cy - 25, 4, 6);
-        ctx.fillRect(cx + 8, cy - 25, 4, 6);
+      case 'ninja': // Băng trán nhẫn giả & Thanh kiếm sau lưng
+        ctx.fillStyle = '#3c2e74';
+        ctx.fillRect(cx - 10, cy - 22, 20, 4);
+        ctx.fillStyle = '#bdc3c7';
+        ctx.fillRect(cx - 3, cy - 22, 6, 4);
         break;
-      case 'ga': // Mào gà đỏ rực
-        ctx.fillStyle = '#ef4444';
-        ctx.fillRect(cx - 3, cy - 26, 6, 7);
-        // Mỏ gà vàng
-        ctx.fillStyle = '#f97316';
-        ctx.fillRect(cx - 2, cy - 10, 4, 3);
-        break;
-      case 'hocsinh': // Khăn quàng đỏ học sinh
-        ctx.fillStyle = '#dc2626';
-        ctx.fillRect(cx - 5, cy - 2, 10, 4);
-        ctx.fillRect(cx - 2, cy + 2, 4, 6);
-        break;
-      case 'duccha': // Cổ áo cha xứ màu trắng
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(cx - 3, cy - 2, 6, 3);
-        break;
-      case 'thantai': // Mũ cánh chuồn Thần Tài
-        ctx.fillStyle = '#dc2626';
-        ctx.fillRect(cx - 10, cy - 26, 20, 7);
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(cx - 16, cy - 22, 6, 3);
-        ctx.fillRect(cx + 10, cy - 22, 6, 3);
-        break;
-      case 'ninja': // Băng đeo trán nhẫn giả
-        ctx.fillStyle = '#4338ca';
-        ctx.fillRect(cx - 10, cy - 21, 20, 4);
-        ctx.fillStyle = '#94a3b8';
-        ctx.fillRect(cx - 3, cy - 21, 6, 4);
-        break;
-      case 'congchua': // Vương miện công chúa
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(cx - 6, cy - 25, 12, 5);
-        ctx.fillRect(cx - 6, cy - 28, 3, 3);
-        ctx.fillRect(cx - 1, cy - 29, 3, 4);
-        ctx.fillRect(cx + 4, cy - 28, 3, 3);
+      case 'congchua': // Phượng miện đính ngọc châu
+        ctx.fillStyle = '#fce881';
+        ctx.fillRect(cx - 8, cy - 26, 16, 6);
+        ctx.fillStyle = '#b82b1c';
+        ctx.fillRect(cx - 2, cy - 29, 4, 4);
         break;
       case 'su':
+      case 'tieu':
+      case 'caotang':
       case 'ni':
-      case 'caotang': // Đầu sư thầy cạo trọc
+        // Đầu cạo trọc Thiếu Lâm
         break;
-      default: // Cư sĩ nam / nữ: Búi tóc gọn gàng
-        ctx.fillStyle = '#221510';
+      default:
+        ctx.fillStyle = '#1c1208';
         ctx.fillRect(cx - 9, cy - 22, 18, 4);
-        ctx.fillRect(cx - 3, cy - 26, 6, 5);
+        ctx.fillRect(cx - 4, cy - 26, 8, 5);
         break;
     }
   }
 
-  drawUserLabel(x, y, name, merit) {
+  drawWuxiaUserLabel(x, y, name, merit) {
     const ctx = this.ctx;
-    ctx.font = '13px "VT323", monospace';
+    ctx.font = '13.5px "VT323", "Noto Serif", serif';
     ctx.textAlign = 'center';
 
     const cleanName = name.length > 12 ? (name.substring(0, 11) + '…') : name;
     const txtWidth = ctx.measureText(cleanName).width;
 
-    ctx.fillStyle = 'rgba(18, 10, 24, 0.88)';
-    ctx.fillRect(x - txtWidth * 0.5 - 5, y - 9, txtWidth + 10, 15);
-    ctx.strokeStyle = merit > 0 ? '#ffe640' : '#d09828';
-    ctx.strokeRect(x - txtWidth * 0.5 - 5, y - 9, txtWidth + 10, 15);
+    // Khung nhãn bài ngọc bích / thẻ gỗ
+    ctx.fillStyle = merit > 0 ? 'rgba(38, 16, 44, 0.94)' : 'rgba(20, 10, 24, 0.9)';
+    ctx.fillRect(x - txtWidth * 0.5 - 6, y - 9, txtWidth + 12, 16);
+    ctx.strokeStyle = merit > 0 ? '#fce881' : '#c58c1b';
+    ctx.strokeRect(x - txtWidth * 0.5 - 6, y - 9, txtWidth + 12, 16);
 
-    ctx.fillStyle = merit > 0 ? '#ffe640' : '#ffffff';
+    ctx.fillStyle = merit > 0 ? '#fce881' : '#fffdf5';
     ctx.fillText(cleanName, x, y + 3);
   }
 
   // ==========================================================================
-  // 6. HOẠT ẢNH BƯỚC LÊN CẮM NHANG LỄ PHẬT (Incense Walk Cycle 16-bit)
+  // 6. KHINH CÔNG LƯỚT LÊN CẮM NHANG (Wuxia Incense Offering Walk Cycle)
   // ==========================================================================
   drawIncenseOfferings() {
     const now = performance.now();
@@ -766,24 +843,24 @@ class PixelSceneRenderer {
       let bowOffset = 0;
       let isHoldingIncense = true;
 
-      if (progress < 0.3) {
-        // Pha 1: Bước đi lên trước lư hương (0..30%)
-        const p1 = progress / 0.3;
+      if (progress < 0.28) {
+        // Pha 1: Thi triển khinh công lướt tới trước lư hương (0..28%)
+        const p1 = progress / 0.28;
         curX = anim.startX + (anim.targetX - anim.startX) * p1;
         curY = anim.startY + (anim.targetY - anim.startY) * p1;
-        bowOffset = Math.sin(p1 * Math.PI * 8) * 3; // Nhấp nhô bước chân
-      } else if (progress < 0.7) {
-        // Pha 2: Dâng nhang & Cúi lạy 3 xá trước tượng Phật (30..70%)
+        bowOffset = Math.sin(p1 * Math.PI * 6) * 4; // Nhấp nhô khinh công
+      } else if (progress < 0.72) {
+        // Pha 2: Dâng nhang & Cúi đầu 3 bái tạ ơn Tam Bảo (28..72%)
         curX = anim.targetX;
         curY = anim.targetY;
-        const p2 = (progress - 0.3) / 0.4;
-        bowOffset = Math.sin(p2 * Math.PI * 6) * 6; // 3 nhịp cúi lạy sâu
+        const p2 = (progress - 0.28) / 0.44;
+        bowOffset = Math.sin(p2 * Math.PI * 6) * 7; // 3 nhịp bái sâu
       } else {
-        // Pha 3: Bước lùi về bồ đoàn (70..100%)
-        const p3 = (progress - 0.7) / 0.3;
+        // Pha 3: Thi triển lùi bước khinh công về bồ đoàn (72..100%)
+        const p3 = (progress - 0.72) / 0.28;
         curX = anim.targetX + (anim.startX - anim.targetX) * p3;
         curY = anim.targetY + (anim.startY - anim.targetY) * p3;
-        bowOffset = Math.sin(p3 * Math.PI * 8) * 3;
+        bowOffset = Math.sin(p3 * Math.PI * 6) * 4;
         isHoldingIncense = false;
       }
 
@@ -791,32 +868,31 @@ class PixelSceneRenderer {
       this.ctx.translate(Math.round(curX), Math.round(curY + bowOffset));
       
       // Vẽ nhân vật
-      this.drawCharacterSprite(0, -12, anim.user.skin || 'nam');
+      this.drawChibiWuxiaSprite(0, -12, anim.user.skin || 'nam');
 
-      // Cầm 3 nén nhang đỏ bốc khói vàng trên tay
+      // Cầm 3 nén chân hương bốc khói rực lửa
       if (isHoldingIncense) {
-        this.ctx.fillStyle = '#dc2626';
-        this.ctx.fillRect(-2, -26, 4, 12);
-        this.ctx.fillStyle = '#fde047';
-        this.ctx.fillRect(-3, -29, 6, 3); // Lửa nhang đỏ vàng
+        this.ctx.fillStyle = '#b82b1c';
+        this.ctx.fillRect(-2, -28, 4, 14);
+        this.ctx.fillStyle = '#fce881';
+        this.ctx.fillRect(-3, -31, 6, 4);
       }
 
-      // Tên nhân vật
-      this.drawUserLabel(0, 14, `🙏 ${anim.user.nickname}`, anim.user.meritPoints || 0);
+      this.drawWuxiaUserLabel(0, 15, `🙏 ${anim.user.nickname}`, anim.user.meritPoints || 0);
       this.ctx.restore();
     }
   }
 
   // ==========================================================================
-  // 7. SÓNG ÂM CHUÔNG ĐẠI HỒNG CHUNG & HOA SEN NỞ TẶNG QUÀ
+  // 7. SÓNG ÂM THIỀN ĐẠO & TRẬN PHÁP HOA SEN BÙNG NỔ
   // ==========================================================================
   drawVisualEffects() {
     const ctx = this.ctx;
 
-    // Vòng sóng âm chuông 16-bit
+    // Vòng sóng âm Đại Hồng Chung lan tỏa
     for (let b = this.bellRings.length - 1; b >= 0; b--) {
       const bell = this.bellRings[b];
-      bell.radius += 5.5;
+      bell.radius += 6.0;
       bell.life -= bell.decay;
 
       if (bell.life <= 0 || bell.radius >= bell.maxRadius) {
@@ -824,17 +900,17 @@ class PixelSceneRenderer {
         continue;
       }
 
-      ctx.strokeStyle = `rgba(255, 230, 80, ${bell.life * 0.75})`;
+      ctx.strokeStyle = `rgba(252, 232, 129, ${bell.life * 0.8})`;
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.arc(bell.x, bell.y, bell.radius, 0, Math.PI * 2);
       ctx.stroke();
     }
 
-    // Vụ nổ hoa sen vàng tặng quà (Gift Bursts)
+    // Hoa sen vàng bùng nổ khi được cúng dường (Gift Burst)
     for (let k = this.burstEffects.length - 1; k >= 0; k--) {
       const burst = this.burstEffects[k];
-      burst.radius += 1.8;
+      burst.radius += 2.0;
       burst.life -= burst.decay;
 
       if (burst.life <= 0) {
@@ -842,7 +918,6 @@ class PixelSceneRenderer {
         continue;
       }
 
-      // Vẽ cánh sen pixel tỏa ra 8 hướng
       ctx.fillStyle = burst.color;
       for (let i = 0; i < 8; i++) {
         const ang = (i * Math.PI) / 4;
@@ -854,7 +929,7 @@ class PixelSceneRenderer {
   }
 
   // ==========================================================================
-  // 8. HẠT BẦU KHÍ QUYỂN PIXEL (Cánh Sen, Bụi Vàng, Đom Đóm)
+  // 8. HẠT KHÍ QUYỂN CỔ PHONG (Cánh Sen, Chân Khí, Tàn Nhang)
   // ==========================================================================
   drawAtmosphereParticles() {
     const ctx = this.ctx;

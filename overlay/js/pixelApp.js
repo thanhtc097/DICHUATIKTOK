@@ -1,6 +1,7 @@
 /**
  * ============================================================================
- * PIXEL APP — KẾT NỐI SOCKET.IO & ĐIỀU PHỐI HUD PHIÊN BẢN RETRO 16-BIT
+ * PIXEL APP — KẾT NỐI SOCKET.IO & ĐIỀU PHỐI HUD PHONG CÁCH VÕ HIỆP CỔ PHONG
+ * Hero's Adventure: Road to Passion (Đại Hiệp Lập Chí Truyện Style)
  * ============================================================================
  */
 
@@ -64,7 +65,7 @@
     });
   }
 
-  // Cập nhật danh sách bảng Công Đức bên phải
+  // Cập nhật danh sách Bảng Phước Duyên bên phải
   function renderMeritList(meritList = []) {
     if (!meritContainer) return;
     if (!meritList || meritList.length === 0) {
@@ -80,10 +81,10 @@
     `).join('');
   }
 
-  // Hiển thị hộp thoại Sớ Vàng RPG Retro
+  // Hiển thị hộp thoại Sớ Vàng Cuộn Trục Cổ Phong
   function showChantToast(title, text, durationMs = 9500) {
     if (!chantToast) return;
-    if (chantToastTitle) chantToastTitle.textContent = title || '✦ HỒI HƯỚNG CÔNG ĐỨC ✦';
+    if (chantToastTitle) chantToastTitle.textContent = title || '✦ VẠN CỔ THIỀN DUYÊN ✦';
     if (chantToastText) chantToastText.textContent = text || '';
     chantToast.classList.remove('hidden');
 
@@ -100,7 +101,7 @@
       .replace(/>/g, '&gt;');
   }
 
-  // Đồng hồ đếm thời gian phiên thiền (Retro Digital Clock)
+  // Đồng hồ đếm thời gian phiên thiền (Võ Lâm Thì Khắc)
   setInterval(() => {
     if (!sessionTimer) return;
     const elapsedSec = Math.max(0, Math.floor((Date.now() - sessionStartTime) / 1000));
@@ -133,15 +134,15 @@
   socket.on('seat_event', evt => {
     if (!evt) return;
     if (typeof evt.seatIndex === 'number') {
-      scene.triggerSeatBurst(evt.seatIndex, '#ffe640');
+      scene.triggerSeatBurst(evt.seatIndex, '#fce881');
 
-      // Khi người xem bình luận "adidaphat" lên cắm nhang lễ Phật
+      // Khi người xem bình luận "adidaphat" khinh công lên cắm nhang lễ Phật
       if (evt.isIncenseOffering || evt.action === 'offer_incense') {
-        const u = (evt.seat && evt.seat.user) ? evt.seat.user : { nickname: 'Phật Tử', skin: 'nam' };
+        const u = (evt.seat && evt.seat.user) ? evt.seat.user : { nickname: 'Hiệp Khách', skin: 'nam' };
         scene.triggerIncenseOffering(evt.seatIndex, u);
         showChantToast(
           `🪔 THÀNH TÂM DÂNG HƯƠNG LỄ PHẬT 🪔`,
-          `Phật tử ${escapeHtml(u.nickname)} dâng nén tâm hương cúng dường Tam Bảo. Nam Mô A Di Đà Phật 🙏`,
+          `Hiệp khách ${escapeHtml(u.nickname)} dâng nén tâm hương cúng dường Tam Bảo. Nam Mô A Di Đà Phật 🙏`,
           8000
         );
       }
@@ -154,10 +155,10 @@
   socket.on('gift_event', evt => {
     if (!evt) return;
     if (typeof evt.seatIndex === 'number') {
-      scene.triggerSeatBurst(evt.seatIndex, '#ffea00');
+      scene.triggerSeatBurst(evt.seatIndex, '#fce881');
     }
     showChantToast(
-      `✦ CÔNG ĐỨC VÔ LƯỢNG · ${evt.donorName.toUpperCase()} ✦`,
+      `✦ VẠN CỔ THIỀN DUYÊN · ${evt.donorName.toUpperCase()} ✦`,
       evt.chantText,
       11000
     );
@@ -166,8 +167,8 @@
   socket.on('chant_speech', payload => {
     if (!payload) return;
     const title = payload.type === 'merit_dedication'
-      ? `✦ XƯỚNG TÊN HỒI HƯỚNG · ${(payload.donorName || '').toUpperCase()} ✦`
-      : `✦ ${(payload.title || 'TỤNG KINH TỊNH TÂM').toUpperCase()} ✦`;
+      ? `✦ XƯỚNG DANH HỒI HƯỚNG · ${(payload.donorName || '').toUpperCase()} ✦`
+      : `✦ ${(payload.title || 'VẠN CỔ THIỀN ÂM').toUpperCase()} ✦`;
     showChantToast(title, payload.text, 11000);
 
     if (audio) {
@@ -190,7 +191,7 @@
   });
 
   // ==========================================================================
-  // KHUNG HƯỚNG DẪN BÊN TRÁI: CAROUSEL VÀ GẬP MỞ
+  // KHUNG VÕ LÂM THIỀN QUY BÊN TRÁI: CAROUSEL VÀ GẬP MỞ
   // ==========================================================================
   const guideCard = document.getElementById('guide-card');
   const btnToggleGuide = document.getElementById('btn-toggle-guide');

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Thiền Đường Tịnh Tâm — Phiên Bản Pixel Art 16-Bit Retro (9:16)</title>
+  <title>Thiếu Lâm Cổ Tự — Phiên Bản Võ Hiệp Cổ Phong 16-Bit (Hero's Adventure Style)</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3" />
   <link rel="shortcut icon" href="/favicon.svg?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,27 +14,29 @@
 <body>
   <!-- Khung chuẩn 9:16 cho ManyCam, OBS Studio & TikTok LIVE Studio -->
   <div id="stage-container">
-    <!-- 1. LỚP CANVAS RENDER CẢNH CHÙA & THIỀN SINH PIXEL ART 16-BIT -->
+    <!-- 1. LỚP CANVAS RENDER CẢNH THIẾU LÂM & HIỆP KHÁCH ĐẢ TỌA -->
     <canvas id="pixel-canvas"></canvas>
 
-    <!-- 2. LỚP HIỆU ỨNG TIVI CRT RETRO SCANLINES -->
+    <!-- 2. LỚP PHỦ ÁNH SÁNG & SƠN THỦY CỔ PHONG -->
     <div class="scanlines-overlay"></div>
 
-    <!-- 3. TOP HUD: BANNER CHÙA PIXEL VÀ BỘ ĐẾM SỐ THIỀN SINH -->
+    <!-- 3. TOP HUD: BANNER THIẾU LÂM CỔ TỰ & BỘ ĐẾM THIỀN SINH -->
     <header class="top-hud">
       <div class="temple-banner">
-        <div class="banner-lotus-pixel">☸</div>
+        <div class="banner-seal-wrap">
+          <span class="seal-stamp">佛</span>
+        </div>
         <div class="banner-texts">
-          <h1 id="banner-title">CỔ TỰ TỊNH TÂM 16-BIT</h1>
-          <p id="banner-subtitle">Nam Mô A Di Đà Phật</p>
+          <h1 id="banner-title">THIẾU LÂM CỔ TỰ</h1>
+          <p id="banner-subtitle">Nam Mô A Di Đà Phật · Vạn Cổ Thiền Duyên</p>
         </div>
       </div>
 
       <div class="status-pills">
         <div class="status-pill">
-          <span class="pixel-blinking-dot"></span>
+          <span class="jade-qi-dot"></span>
           <strong id="seat-counter">0/24</strong>
-          <span class="pill-sub">đang thiền</span>
+          <span class="pill-sub">đả tọa</span>
         </div>
         <div class="status-pill">
           <span>⏱</span>
@@ -43,68 +45,68 @@
       </div>
     </header>
 
-    <!-- 4. BẢNG HƯỚNG DẪN BÊN TRÁI (RETRO 16-BIT) -->
-    <aside id="guide-card" class="pixel-box left-guide-card">
+    <!-- 4. BẢNG VÕ LÂM THIỀN QUY BÊN TRÁI -->
+    <aside id="guide-card" class="wuxia-box left-guide-card">
       <div id="guide-drag-handle" class="guide-card-header">
-        <span class="guide-header-title">📜 HƯỚNG DẪN</span>
+        <span class="guide-header-title">📜 VÕ LÂM THIỀN QUY</span>
         <button id="btn-toggle-guide" class="guide-btn-toggle" title="Thu nhỏ / Mở rộng">─</button>
       </div>
       
       <div class="guide-body-content">
         <div class="guide-block">
           <span class="guide-icon">💬</span>
-          <span>Bình luận để vào thiền</span>
+          <span>Bình luận để vào đả tọa</span>
         </div>
         <div class="guide-divider"></div>
         <div class="guide-block">
           <span class="guide-icon">🪔</span>
-          <span>Gõ <b class="kw-gold">adidaphat</b> dâng hương</span>
+          <span>Gõ <b class="kw-wuxia-gold">adidaphat</b> dâng hương</span>
         </div>
         <div class="guide-divider"></div>
         
         <!-- Khối Carousel tự động luân phiên -->
         <div class="guide-carousel-viewport">
           <div class="guide-carousel-slide active" data-slide="0">
-            <div>Đổi hình: <b class="kw-gold">nam</b> · <b class="kw-gold">nữ</b> · <b class="kw-gold">sư</b></div>
-            <div><b class="kw-gold">tiểu</b> · <b class="kw-gold">học sinh</b> · <b class="kw-gold">thần tài</b></div>
+            <div>Hóa hình: <b class="kw-wuxia-gold">nam</b> · <b class="kw-wuxia-gold">nữ</b> · <b class="kw-wuxia-gold">sư</b></div>
+            <div><b class="kw-wuxia-gold">tiểu</b> · <b class="kw-wuxia-gold">học sinh</b> · <b class="kw-wuxia-gold">thần tài</b></div>
           </div>
           <div class="guide-carousel-slide" data-slide="1">
-            <div>Đổi hình: <b class="kw-gold">công chúa</b> · <b class="kw-gold">ninja</b></div>
-            <div><b class="kw-gold">bác sĩ</b> · <b class="kw-gold">cảnh sát</b> · <b class="kw-gold">trộm</b></div>
+            <div>Hóa hình: <b class="kw-wuxia-gold">công chúa</b> · <b class="kw-wuxia-gold">ninja</b></div>
+            <div><b class="kw-wuxia-gold">bác sĩ</b> · <b class="kw-wuxia-gold">cảnh sát</b> · <b class="kw-wuxia-gold">trộm</b></div>
           </div>
           <div class="guide-carousel-slide" data-slide="2">
-            <div>🎁 <span class="kw-gold">Tặng quà</span> được xướng tên</div>
-            <div class="kw-gold">✦ Hồi Hướng Công Đức ✦</div>
+            <div>🎁 <span class="kw-wuxia-gold">Tặng quà</span> xướng danh</div>
+            <div class="kw-wuxia-red">✦ Phước Duyên Bảng ✦</div>
           </div>
         </div>
       </div>
     </aside>
 
-    <!-- 5. BẢNG CÔNG ĐỨC BÊN PHẢI (RETRO RPG MERIT BOARD) -->
-    <aside class="pixel-box right-merit-card">
-      <div class="merit-header">✦ CÔNG ĐỨC ✦</div>
+    <!-- 5. BẢNG PHƯỚC DUYÊN BÊN PHẢI (WUXIA MERIT BOARD) -->
+    <aside class="wuxia-box right-merit-card">
+      <div class="merit-header">✦ PHƯỚC DUYÊN BẢNG ✦</div>
       <div id="merit-list-container" class="merit-body">
         <div class="merit-empty">Chưa có</div>
       </div>
     </aside>
 
-    <!-- 6. SỚ VÀNG HỒI HƯỚNG CÔNG ĐỨC (RETRO RPG DIALOG BOX) -->
+    <!-- 6. SỚ VÀNG CUỘN TRỤC HOÀNG KIM (WUXIA IMPERIAL BUDDHIST SCROLL) -->
     <div id="chant-toast" class="chant-toast hidden">
       <div class="chant-toast-inner">
-        <div class="chant-toast-title" id="chant-toast-title">✦ HỒI HƯỚNG CÔNG ĐỨC ✦</div>
+        <div class="chant-toast-title" id="chant-toast-title">✦ VẠN CỔ THIỀN DUYÊN · HỒI HƯỚNG CÔNG ĐỨC ✦</div>
         <div class="chant-toast-text" id="chant-toast-text">
           Nam Mô A Di Đà Phật
         </div>
       </div>
     </div>
 
-    <!-- 7. THANH ĐIỀU KHIỂN NHANH DƯỚI ĐÁY -->
+    <!-- 7. THANH LỆNH BÀI ĐIỀU KHIỂN NHANH DƯỚI ĐÁY -->
     <div id="quick-toolbar" class="quick-toolbar">
       <button id="btn-unlock-audio" class="toolbar-btn active-pulse" title="Bật Âm Thanh Chuông Mõ">
         🔊 BẬT ÂM
       </button>
-      <button id="btn-test-bell" class="toolbar-btn" title="Thỉnh Chuông">🔔 CHUÔNG</button>
-      <button id="btn-test-chant" class="toolbar-btn" title="Thử Giọng Đọc Kinh">📿 ĐỌC KINH</button>
+      <button id="btn-test-bell" class="toolbar-btn" title="Thỉnh Đại Hồng Chung">🔔 CHUÔNG</button>
+      <button id="btn-test-chant" class="toolbar-btn" title="Thử Giọng Đọc Kinh">📿 TỤNG KINH</button>
       <a href="/" class="toolbar-btn toolbar-link" title="Chuyển về Giao diện 3D Gốc">🏛️ BẢN 3D</a>
       <a href="/admin" target="_blank" class="toolbar-btn toolbar-link" title="Mở Web Admin">⚙️ ADMIN</a>
     </div>
