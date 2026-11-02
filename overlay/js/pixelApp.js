@@ -33,9 +33,13 @@
 
   // Mở khóa âm thanh Web Audio API khi người dùng click
   function unlockAudio() {
-    if (audio && !audio.unlocked) {
-      audio.initContext();
-      audio.playTempleBell(0.75);
+    if (audio) {
+      if (!audio.ctx) {
+        audio.initContext();
+      } else if (audio.ctx.state === 'suspended') {
+        audio.ctx.resume().catch(() => {});
+      }
+      audio.unlocked = true;
       if (btnUnlockAudio) {
         btnUnlockAudio.textContent = '🔊 ĐÃ BẬT ÂM';
         btnUnlockAudio.classList.remove('active-pulse');
@@ -43,11 +47,22 @@
     }
   }
 
-  window.addEventListener('pointerdown', unlockAudio, { once: false });
-  if (btnUnlockAudio) btnUnlockAudio.addEventListener('click', unlockAudio);
+  window.addEventListener('click', unlockAudio);
+  window.addEventListener('pointerdown', unlockAudio);
+  window.addEventListener('keydown', unlockAudio);
+
+  if (btnUnlockAudio) {
+    btnUnlockAudio.addEventListener('click', e => {
+      e.stopPropagation();
+      unlockAudio();
+      audio.playTempleBell(0.95);
+      scene.triggerBellRing();
+    });
+  }
 
   if (btnTestBell) {
-    btnTestBell.addEventListener('click', () => {
+    btnTestBell.addEventListener('click', e => {
+      e.stopPropagation();
       unlockAudio();
       audio.playTempleBell(1.0);
       scene.triggerBellRing();
@@ -55,13 +70,14 @@
   }
 
   if (btnTestChant) {
-    btnTestChant.addEventListener('click', () => {
+    btnTestChant.addEventListener('click', e => {
+      e.stopPropagation();
       unlockAudio();
       fetch('/api/chant', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
-      });
+      }).catch(err => console.error(err));
     });
   }
 

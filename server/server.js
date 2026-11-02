@@ -1,3 +1,4 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * Server chính cho App Live Stream Đi Chùa Bái Phật ("Thiền Đường Tịnh Tâm")
  * Phục vụ Overlay (Canvas/Three.js), kết nối WinForms Control Panel và TikFinity.

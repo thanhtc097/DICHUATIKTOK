@@ -1,3 +1,4 @@
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 /**
  * Dịch vụ tạo Giọng Nam Trầm Ấm Đọc Kinh / Xướng Tên Hồi Hướng (Edge Neural TTS + Fallback)
  */
