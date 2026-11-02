@@ -107,7 +107,7 @@ class TempleAudioEngine {
     if (this.bellAudioBuffer || this.bellLoading) return;
     this.bellLoading = true;
     try {
-      const res = await fetch('/assets/sounds/bell.mp3');
+      const res = await fetch('/assets/sounds/bell.mp3?v=2.5s');
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const arrayBuffer = await res.arrayBuffer();
 
@@ -162,7 +162,7 @@ class TempleAudioEngine {
 
     // 2. DỰ PHÒNG: Phát qua HTML5 Audio Element để đảm bảo luôn phát ra tiếng chuông ngay cả khi chưa kịp nạp buffer
     try {
-      const audioEl = new Audio('/assets/sounds/bell.mp3');
+      const audioEl = new Audio('/assets/sounds/bell.mp3?v=2.5s');
       audioEl.volume = Math.max(0.2, Math.min(1.0, intensity * 0.95));
       audioEl.play().catch(e => console.warn('[AudioEngine] HTML5 Audio play:', e));
     } catch (_) {}
